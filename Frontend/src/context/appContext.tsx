@@ -3,6 +3,7 @@ import React, { createContext, useContext, ReactNode,useState ,useEffect} from '
 import axios from 'axios';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import { set } from 'date-fns';
 interface checkauthresponse{
   success:boolean;
   message:string;
@@ -14,14 +15,30 @@ interface AppContextProps {
   checkauth:()=>Promise<void>;
   login:(redg:string,password:string)=>Promise<void>;
   logout:()=>Promise<void>;
+  student:student | null;
+  setstudent:React.Dispatch<React.SetStateAction<student | null>>;
+  getstudentdata:()=>Promise<void>;
 }
-
+interface student{
+  name:string;
+  redg:string;
+  email:string;
+  branch:string;
+  course:string;
+  profilepicurl:string;
+}
+interface getstudentdataresponse{
+  success:boolean;
+  message:string;
+  data:student;
+}
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const baseUrl = 'http://localhost:4000'; // Change to your backend URL
   const [token, settoken] = useState<Boolean>(false)
+  const [student, setstudent] = useState<student >()
   const checkauth=async()=>{
     try{
       const {data}=await axios.get<checkauthresponse>(`${baseUrl}/api/student/checkauth`,{withCredentials:true});
@@ -63,14 +80,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.log(err);
     }
   }
+  const getstudentdata=async()=>{
+    try{
+      const {data}=await axios.get<getstudentdataresponse>(`${baseUrl}/api/student/studentdetails`,{withCredentials:true});
+      if(data.success){
+        setstudent(data.data);
+      }else{
+        toast.error("Failed to fetch student data");
+      }
+    }catch(err){
+      console.log(err);
+    }
+  }
   useEffect(() => {
     checkauth();
-
-
+    getstudentdata();
   }, [token])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout }}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent}}>
       {children}
     </AppContext.Provider>
   );

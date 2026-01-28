@@ -65,11 +65,11 @@ const getstudentdetails=async (req,res)=>{
             return res.json({success:false,message:"Not Authenticated"})
         }
         const decode=jwt.verify(token,process.env.JWT_SECRET);
-        const student=await Student.findById(decode.id).select('-password');
+        const student=await Student.findById(decode.id).select('-password -joinedDate -__v -_id');
         if(!student){
             return res.json({success:false,message:"Not Authenticated"})
         }
-        res.json({success:true,message:"Student Details Fetched",student})
+        res.json({success:true,message:"Student Details Fetched",data:student})
     }catch(error){
         console.error("Error fetching student details:", error);
         res.json({success:false,message:"Internal Server Error"})

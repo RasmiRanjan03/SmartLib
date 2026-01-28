@@ -10,13 +10,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { currentStudent, issuedBooks, borrowingHistory, books } from "@/data/mockData";
+import {  issuedBooks, borrowingHistory, books } from "@/data/mockData";
+import {useApp} from "../context/appContext";
+
 
 const Profile = () => {
   const totalFine = [...issuedBooks, ...borrowingHistory].reduce(
     (sum, book) => sum + book.fine,
     0
   );
+  const { token, student } = useApp();
+
+  if (!student) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <span className="text-lg text-muted-foreground">Loading profile...</span>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -27,17 +40,17 @@ const Profile = () => {
           <CardContent className="relative pt-0">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12">
               <Avatar className="h-24 w-24 border-4 border-card shadow-lg">
-                <AvatarImage src={currentStudent.profilePicture} alt={currentStudent.name} />
+                <AvatarImage src={student.profilepicurl} alt={student.name} />
                 <AvatarFallback className="text-2xl">
-                  {currentStudent.name.split(" ").map((n) => n[0]).join("")}
+                  {student.name.split(" ").map((n) => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="text-center sm:text-left pb-4">
                 <h1 className="text-2xl font-bold text-foreground">
-                  {currentStudent.name}
+                  {student.name}
                 </h1>
                 <p className="text-muted-foreground">
-                  {currentStudent.registrationNumber}
+                  {student.redg}
                 </p>
               </div>
             </div>
@@ -55,7 +68,7 @@ const Profile = () => {
             <div>
               <p className="text-sm text-muted-foreground">Registration No</p>
               <p className="font-semibold text-foreground">
-                {currentStudent.registrationNumber}
+                {student.redg}
               </p>
             </div>
           </CardContent>
@@ -68,7 +81,7 @@ const Profile = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Course</p>
-              <p className="font-semibold text-foreground">{currentStudent.course}</p>
+              <p className="font-semibold text-foreground">{student.course}</p>
             </div>
           </CardContent>
         </Card>
@@ -81,7 +94,7 @@ const Profile = () => {
             <div>
               <p className="text-sm text-muted-foreground">Branch</p>
               <p className="font-semibold text-foreground truncate max-w-[150px]">
-                {currentStudent.branch}
+                {student.branch}
               </p>
             </div>
           </CardContent>
