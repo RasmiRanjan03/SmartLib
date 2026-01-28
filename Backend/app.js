@@ -5,6 +5,7 @@ import connectCloudinary from './config/cloudinary.js';
 import connectDB from './config/mongodbconnection.js';
 import cookieParser from 'cookie-parser';
 import admin from './routes/adminroute.js';
+import student from './routes/studentroute.js';
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use('/api/admin',admin)
+app.use('/api/student',student)
 app.get('/', (req, res) => {
   res.send('Welcome to SmartLib Backend Rasmi!');
 });

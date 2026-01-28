@@ -18,6 +18,8 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  redg:{type: String, required: true},
+  password: {type: String, required: true},
   profilepicurl: {type: String, required: true},
   joinedDate: {
     type: Date,
