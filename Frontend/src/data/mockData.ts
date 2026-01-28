@@ -20,12 +20,13 @@ export interface Student {
   registrationNumber: string;
   course: string;
   branch: string;
-  profilePicture: string;
+  image: string;
   email: string;
 }
 
 export interface IssuedBook {
   id: string;
+  userId: string;
   bookId: string;
   bookTitle: string;
   issueDate: string;
@@ -184,21 +185,23 @@ export const currentStudent: Student = {
   registrationNumber: "2024CS001",
   course: "B.Tech",
   branch: "Computer Science & Engineering",
-  profilePicture: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+  image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
   email: "john.doe@college.edu"
 };
 
 export const issuedBooks: IssuedBook[] = [
   {
     id: "ISS001",
+    userId: "STU001",
     bookId: "1",
     bookTitle: "Introduction to Algorithms",
     issueDate: "2024-01-20",
     dueDate: "2024-02-03",
-    fine: 0
+    fine: 80
   },
   {
     id: "ISS002",
+    userId: "STU001",
     bookId: "4",
     bookTitle: "The Pragmatic Programmer",
     issueDate: "2024-01-15",
@@ -210,6 +213,7 @@ export const issuedBooks: IssuedBook[] = [
 export const borrowingHistory: IssuedBook[] = [
   {
     id: "ISS003",
+    userId: "STU001",
     bookId: "5",
     bookTitle: "Database System Concepts",
     issueDate: "2023-12-01",
@@ -219,6 +223,7 @@ export const borrowingHistory: IssuedBook[] = [
   },
   {
     id: "ISS004",
+    userId: "STU001",
     bookId: "7",
     bookTitle: "Computer Networks",
     issueDate: "2023-11-10",
@@ -228,6 +233,7 @@ export const borrowingHistory: IssuedBook[] = [
   },
   {
     id: "ISS005",
+    userId: "STU001",
     bookId: "8",
     bookTitle: "Operating System Concepts",
     issueDate: "2023-10-05",
