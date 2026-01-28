@@ -32,6 +32,7 @@ export interface IssuedBook {
   issueDate: string;
   dueDate: string;
   returnDate?: string;
+  isreturned: boolean;
   fine: number;
 }
 
@@ -156,7 +157,7 @@ export const books: Book[] = [
     genre: "Artificial Intelligence",
     summary: "This book covers the field of machine learning, which is the study of algorithms that allow computer programs to automatically improve through experience.",
     coverImage: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=300&h=400&fit=crop",
-    rating: 4.5,
+    rating: 1.5,
     reviewCount: 198,
     totalCopies: 10,
     availableCopies: 2,
@@ -196,7 +197,8 @@ export const issuedBooks: IssuedBook[] = [
     bookId: "1",
     bookTitle: "Introduction to Algorithms",
     issueDate: "2024-01-20",
-    dueDate: "2024-02-03",
+    dueDate: "2026-01-29",
+    isreturned: false,
     fine: 80
   },
   {
@@ -206,6 +208,7 @@ export const issuedBooks: IssuedBook[] = [
     bookTitle: "The Pragmatic Programmer",
     issueDate: "2024-01-15",
     dueDate: "2024-01-29",
+    isreturned: false,
     fine: 50
   }
 ];
@@ -219,6 +222,7 @@ export const borrowingHistory: IssuedBook[] = [
     issueDate: "2023-12-01",
     dueDate: "2023-12-15",
     returnDate: "2023-12-14",
+    isreturned: true,
     fine: 0
   },
   {
@@ -229,6 +233,7 @@ export const borrowingHistory: IssuedBook[] = [
     issueDate: "2023-11-10",
     dueDate: "2023-11-24",
     returnDate: "2023-11-26",
+    isreturned: true,
     fine: 20
   },
   {
@@ -239,6 +244,7 @@ export const borrowingHistory: IssuedBook[] = [
     issueDate: "2023-10-05",
     dueDate: "2023-10-19",
     returnDate: "2023-10-18",
+    isreturned: true,
     fine: 0
   }
 ];

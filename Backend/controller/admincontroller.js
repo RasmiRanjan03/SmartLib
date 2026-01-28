@@ -1,4 +1,5 @@
 import Student from "../Model/studentmodel.js";
+import Book from "../Model/bookmodel.js";
 import {v2 as cloudinary} from 'cloudinary';
 const addstudent=async (req,res)=>{
     try{
@@ -42,4 +43,31 @@ const addstudent=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
-export {addstudent};
+const addbook=async (req,res)=>{
+    try{
+        const {title,author,genre,summary,totalcopies,keywords,rating,reviewcount}=req.body;
+        const coverImage=req.file;
+        const imageupload = await cloudinary.uploader.upload(coverImage.path, {
+            resource_type: 'image',
+        });
+        const imageUrl = imageupload.secure_url;
+        const newbook=new Book({
+            title,
+            author,
+            totalcopies,
+            availablecopies:totalcopies,
+            keywords:keywords ? keywords.split(',').map(kw => kw.trim()) : [],
+            genre,
+            summary,
+            rating,
+            reviewcount,
+            addedDate:Date.now(),
+            coverImageUrl:imageUrl});
+        await newbook.save();
+        res.json({success:true,message:"Book Added Successfully"})
+        }catch(error){
+        console.error("Error adding book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }
+}
+export {addstudent,addbook};
