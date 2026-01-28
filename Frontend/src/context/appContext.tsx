@@ -13,6 +13,7 @@ interface AppContextProps {
   settoken: React.Dispatch<React.SetStateAction<Boolean>>;
   checkauth:()=>Promise<void>;
   login:(redg:string,password:string)=>Promise<void>;
+  logout:()=>Promise<void>;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -36,13 +37,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }
   const login=async(redg:string,password:string)=>{
     try{
-      const {data}=await axios.post("http://localhost:4000/api/student/login",{redg,password},{withCredentials:true});
+      const {data}=await axios.post(`${baseUrl}/api/student/login`,{redg,password},{withCredentials:true});
       if(data.success){
         settoken(true);
         toast.success("Login successful! Welcome to SmartLib.");
         navigate("/dashboard");
       }else{
         toast.error("Login failed");
+      }
+    }catch(err){
+      console.log(err);
+    }
+  }
+  const logout=async()=>{
+    try{
+      const {data}=await axios.get(`${baseUrl}/api/student/logout`,{withCredentials:true});
+      if(data.success){
+        settoken(false);
+        toast.success("Logout successful!");
+        navigate("/login");
+      }else{
+        toast.error("Logout failed");
       }
     }catch(err){
       console.log(err);
@@ -55,7 +70,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [token])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login }}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout }}>
       {children}
     </AppContext.Provider>
   );

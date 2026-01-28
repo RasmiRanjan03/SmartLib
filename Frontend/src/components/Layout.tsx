@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, BookOpen, User, LogOut, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useApp } from "../context/appContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ const Layout = ({ children }: LayoutProps) => {
     { path: "/books", label: "All Books", icon: BookOpen },
     { path: "/profile", label: "Profile", icon: User },
   ];
+  const { logout } = useApp();
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,13 +52,13 @@ const Layout = ({ children }: LayoutProps) => {
             })}
           </nav>
 
-          <Link
-            to="/login"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Logout</span>
-          </Link>
+          </button>
         </div>
       </header>
 

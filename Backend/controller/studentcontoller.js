@@ -28,6 +28,20 @@ const studentlogin=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
+const logout=async (req,res)=>{
+    try{
+        res.clearCookie('token',{   
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path:'/',
+        });
+        res.json({success:true,message:"Logout Successful"})
+    }catch(error){
+        console.error("Error during student logout:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }
+}
 const checkstudentauth=async (req,res)=>{
     try{
         const token=req.cookies.token;
@@ -44,4 +58,4 @@ const checkstudentauth=async (req,res)=>{
     console.error("Error during student authentication:", error);
     res.json({success:false,message:"Internal Server Error"})
 }}
-export {studentlogin,checkstudentauth};
+export {studentlogin,checkstudentauth,logout};
