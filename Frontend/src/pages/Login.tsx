@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-
+import { useApp } from "../context/appContext";
 const Login = () => {
-  const navigate = useNavigate();
+  
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const {login}=useApp();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,14 +22,14 @@ const Login = () => {
       toast.error("Please fill in all fields");
       return;
     }
+    login(registrationNumber,password);
 
     setIsLoading(true);
     
     // Simulate login delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
     
-    toast.success("Login successful! Welcome to SmartLib.");
-    navigate("/dashboard");
+    
     setIsLoading(false);
   };
 
