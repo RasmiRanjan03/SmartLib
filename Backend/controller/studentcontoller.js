@@ -28,4 +28,20 @@ const studentlogin=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
-export {studentlogin};
+const checkstudentauth=async (req,res)=>{
+    try{
+        const token=req.cookies.token;
+        if(!token){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        const decode=jwt.verify(token,process.env.JWT_SECRET);
+        const student=await Student.findById(decode.id).select('-password');
+        if(!student){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        res.json({success:true,message:"Authenticated"})
+}catch(error){
+    console.error("Error during student authentication:", error);
+    res.json({success:false,message:"Internal Server Error"})
+}}
+export {studentlogin,checkstudentauth};
