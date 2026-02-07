@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Student from '../Model/studentmodel.js';
+import Book from '../Model/bookmodel.js';
 
 const studentlogin=async (req,res)=>{
     try{
@@ -74,4 +75,12 @@ const getstudentdetails=async (req,res)=>{
         console.error("Error fetching student details:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {studentlogin,checkstudentauth,logout,getstudentdetails};
+const getallbooks=async (req,res)=>{
+    try{
+        const books=await Book.find({});
+        res.json({success:true,message:"All Books Fetched",data:books})
+    }catch(error){
+        console.error("Error fetching all books:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks};

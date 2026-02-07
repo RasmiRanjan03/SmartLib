@@ -136,7 +136,7 @@ const Profile = () => {
                 </TableHeader>
                 <TableBody>
                   {issuedBooks.map((issued) => {
-                    const book = books.find((b) => b.id === issued.bookId);
+                    const book = books.find((b) => b._id === issued.bookId);
                     const isOverdue = new Date(issued.dueDate) < new Date();
                     return (
                       <TableRow key={issued.id}>
@@ -144,7 +144,7 @@ const Profile = () => {
                           <div className="flex items-center gap-3">
                             {book && (
                               <img
-                                src={book.coverImage}
+                                src={book.coverImageUrl}
                                 alt={book.title}
                                 className="h-12 w-9 rounded object-cover"
                               />
@@ -221,14 +221,14 @@ const Profile = () => {
                 </TableHeader>
                 <TableBody>
                   {borrowingHistory.map((history) => {
-                    const book = books.find((b) => b.id === history.bookId);
+                    const book = books.find((b) => b._id === history.bookId);
                     return (
                       <TableRow key={history.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {book && (
                               <img
-                                src={book.coverImage}
+                                src={book.coverImageUrl}
                                 alt={book.title}
                                 className="h-12 w-9 rounded object-cover"
                               />

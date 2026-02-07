@@ -1,5 +1,5 @@
 import express from 'express';
-import { studentlogin,checkstudentauth,logout,getstudentdetails } from '../controller/studentcontoller.js';
+import { studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks } from '../controller/studentcontoller.js';
 import studentAuth from '../middleware/studentauth.js';
 import multer from 'multer';
 
@@ -8,5 +8,6 @@ router.post('/login',studentlogin)
 router.get('/checkauth',checkstudentauth)
 router.get('/logout',logout);
 router.get('/studentdetails',studentAuth,getstudentdetails)
+router.get('/allbooks',getallbooks)
 
 export default router;

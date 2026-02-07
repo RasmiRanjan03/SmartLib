@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo ,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, Camera, Star } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -12,9 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { books, genres, authors } from "@/data/mockData";
+import {  genres, authors } from "@/data/mockData";
+import { useApp } from "../context/appContext";
 
 const AllBooks = () => {
+ 
+  const { books } = useApp();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
@@ -22,7 +25,16 @@ const AllBooks = () => {
   const [selectedAvailability, setSelectedAvailability] = useState("all");
   const [selectedRating, setSelectedRating] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
-
+if (!books) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <span className="text-lg text-muted-foreground">Loading ...</span>
+        </div>
+      </Layout>
+    );
+  }
+  
   const filteredBooks = useMemo(() => {
     return books
       .filter((book) => {
@@ -42,8 +54,8 @@ const AllBooks = () => {
 
         const matchesAvailability =
           selectedAvailability === "all" ||
-          (selectedAvailability === "available" && book.availableCopies > 0) ||
-          (selectedAvailability === "unavailable" && book.availableCopies === 0);
+          (selectedAvailability === "available" && book.availablecopies > 0) ||
+          (selectedAvailability === "unavailable" && book.availablecopies === 0);
 
         const matchesRating =
           selectedRating === "all" ||
@@ -71,6 +83,7 @@ const AllBooks = () => {
     setSelectedAvailability("all");
     setSelectedRating("all");
   };
+  
 
   return (
     <Layout>
@@ -191,7 +204,7 @@ const AllBooks = () => {
       {filteredBooks.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
           {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} />
+            <BookCard key={book._id} book={book} />
           ))}
         </div>
       ) : (

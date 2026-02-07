@@ -2,10 +2,14 @@ import { BookOpen, BookCheck, AlertTriangle, DollarSign, Clock } from "lucide-re
 import Layout from "@/components/Layout";
 import SummaryCard from "@/components/SummaryCard";
 import BookCard from "@/components/BookCard";
-import { books, issuedBooks, currentStudent } from "@/data/mockData";
+import {  issuedBooks, currentStudent } from "@/data/mockData";
+import { useApp } from "../context/appContext";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   // Calculate summary data
+  const {books,student}=useApp();
   const totalBooks = books.length;
   const booksIssuedByStudent = issuedBooks.length;
   const overdueBooks = issuedBooks.filter(
@@ -15,7 +19,17 @@ const Dashboard = () => {
   const recentBooks = [...books].sort(
     (a, b) => new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime()
   ).slice(0, 6);
+  console.log(books)
 
+   if (!student || !books) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <span className="text-lg text-muted-foreground">Loading Dashboard...</span>
+        </div>
+      </Layout>
+    );
+  }
   return (
     <Layout>
       {/* Welcome Header */}
@@ -24,7 +38,7 @@ const Dashboard = () => {
           Welcome to SmartLib
         </h1>
         <p className="mt-1 text-muted-foreground">
-          Hello, {currentStudent.name}! Explore our digital library collection.
+          Hello, {student.name}! Explore our digital library collection.
         </p>
       </div>
 
@@ -65,7 +79,7 @@ const Dashboard = () => {
           </div>
           <div className="grid gap-4">
             {issuedBooks.map((issued) => {
-              const book = books.find((b) => b.id === issued.bookId);
+              const book = books.find((b) => b._id === issued.bookId);
               const isOverdue = new Date(issued.dueDate) < new Date();
               return (
                 <div
@@ -74,7 +88,7 @@ const Dashboard = () => {
                 >
                   {book && (
                     <img
-                      src={book.coverImage}
+                      src={book.coverImageUrl}
                       alt={book.title}
                       className="h-16 w-12 rounded-lg object-cover"
                     />
@@ -110,16 +124,17 @@ const Dashboard = () => {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-foreground">Recently Added Books</h2>
-          <a
-            href="/books"
-            className="text-sm font-medium text-primary hover:underline"
+          <button
+            onClick={() => navigate("/books")}
+            className="text-sm font-medium text-primary hover:underline bg-transparent border-none cursor-pointer p-0"
+            type="button"
           >
             View All →
-          </a>
+          </button>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {recentBooks.map((book) => (
-            <BookCard key={book.id} book={book} variant="compact" />
+            <BookCard key={book._id} book={book} variant="compact" />
           ))}
         </div>
       </div>

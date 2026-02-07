@@ -18,6 +18,9 @@ interface AppContextProps {
   student:student | null;
   setstudent:React.Dispatch<React.SetStateAction<student | null>>;
   getstudentdata:()=>Promise<void>;
+  books:book[] | null;
+  setbooks:React.Dispatch<React.SetStateAction<book[] | null>>;
+  getallbooks:()=>Promise<void>;
 }
 interface student{
   name:string;
@@ -32,6 +35,25 @@ interface getstudentdataresponse{
   message:string;
   data:student;
 }
+interface book{
+  _id: string;
+  title: string;
+  author: string;
+  genre: string;
+  summary: string;
+  coverImageUrl: string;
+  rating: number;
+  reviewCount: number;
+  totalcopies: number;
+  availablecopies: number;
+  keywords: string[];
+  addedDate: string;
+}
+interface getallbooksresponse{
+  success:boolean;
+  message:string;
+  data:book[];
+}
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -39,6 +61,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const baseUrl = 'http://localhost:4000'; // Change to your backend URL
   const [token, settoken] = useState<Boolean>(false)
   const [student, setstudent] = useState<student >()
+  const [books, setbooks] = useState<book[]>([])
   const checkauth=async()=>{
     try{
       const {data}=await axios.get<checkauthresponse>(`${baseUrl}/api/student/checkauth`,{withCredentials:true});
@@ -92,13 +115,46 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.log(err);
     }
   }
+  const getallbooks=async()=>{
+    try{
+      const {data}=await axios.get<getallbooksresponse>(`${baseUrl}/api/student/allbooks`);
+      if(data.success){
+        // Normalize book properties for frontend compatibility
+        const normalizedBooks = data.data.map((book: any) => ({
+          _id: book._id || book.id,
+          title: book.title,
+          author: book.author,
+          genre: book.genre,
+          summary: book.summary,
+          coverImageUrl: book.coverImageUrl || book.coverImage,
+          rating: book.rating,
+          reviewCount: book.reviewCount,
+          totalcopies: book.totalcopies ?? book.totalCopies ?? 0,
+          availablecopies: book.availablecopies ?? book.availableCopies ?? 0,
+          keywords: book.keywords,
+          addedDate: book.addedDate,
+          expectedAvailability: book.expectedAvailability
+        }));
+        setbooks(normalizedBooks);
+      }else{
+        toast.error("Failed to fetch books data");
+      }
+    }catch(err){
+      toast.error("Failed to fetch books data");
+      console.log(err);
+    }
+  }
   useEffect(() => {
     checkauth();
     getstudentdata();
+
   }, [token])
+  useEffect(() => {
+      getallbooks();
+     }, [])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent}}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks}}>
       {children}
     </AppContext.Provider>
   );

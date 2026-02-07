@@ -3,12 +3,13 @@ import { ArrowLeft, Star, BookOpen, Calendar, User, Tag, Clock } from "lucide-re
 import Layout from "@/components/Layout";
 import BookCard from "@/components/BookCard";
 import { Button } from "@/components/ui/button";
-import { books } from "@/data/mockData";
+import { useApp } from "../context/appContext";
 import { toast } from "sonner";
 
 const BookDetails = () => {
+  const { books } = useApp();
   const { bookId } = useParams<{ bookId: string }>();
-  const book = books.find((b) => b.id === bookId);
+  const book = books.find((b) => b._id === bookId);
 
   if (!book) {
     return (
@@ -29,9 +30,9 @@ const BookDetails = () => {
     );
   }
 
-  const isAvailable = book.availableCopies > 0;
+  const isAvailable = book.availablecopies > 0;
   const recommendedBooks = books
-    .filter((b) => b.id !== book.id && b.genre === book.genre)
+    .filter((b) => b._id !== book._id && b.genre === book.genre)
     .slice(0, 5);
 
   const handleIssueBook = () => {
@@ -60,7 +61,7 @@ const BookDetails = () => {
           <div className="sticky top-24">
             <div className="aspect-[3/4] overflow-hidden rounded-2xl border border-border shadow-lg">
               <img
-                src={book.coverImage}
+                src={book.coverImageUrl}
                 alt={book.title}
                 className="h-full w-full object-cover"
               />
@@ -113,7 +114,7 @@ const BookDetails = () => {
                   <BookOpen className="h-4 w-4" />
                   <span className="text-xs">Total Copies</span>
                 </div>
-                <p className="text-xl font-bold text-foreground">{book.totalCopies}</p>
+                <p className="text-xl font-bold text-foreground">{book.totalcopies}</p>
               </div>
               <div className="p-4 rounded-xl bg-secondary/50 border border-border">
                 <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -121,7 +122,7 @@ const BookDetails = () => {
                   <span className="text-xs">Available</span>
                 </div>
                 <p className={`text-xl font-bold ${isAvailable ? "text-success" : "text-destructive"}`}>
-                  {book.availableCopies}
+                  {book.availablecopies}
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-secondary/50 border border-border">
@@ -201,7 +202,7 @@ const BookDetails = () => {
           </h2>
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {recommendedBooks.map((recBook) => (
-              <BookCard key={recBook.id} book={recBook} variant="compact" />
+              <BookCard key={recBook._id} book={recBook} variant="compact" />
             ))}
           </div>
         </div>

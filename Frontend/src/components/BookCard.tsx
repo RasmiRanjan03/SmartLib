@@ -9,18 +9,18 @@ interface BookCardProps {
 }
 
 const BookCard = ({ book, variant = "default" }: BookCardProps) => {
-  const isAvailable = book.availableCopies > 0;
+  const isAvailable = book.availablecopies > 0;
 
   if (variant === "compact") {
     return (
       <Link
-        to={`/book/${book.id}`}
+        to={`/book/${book._id}`}
         className="group flex-shrink-0 w-40"
       >
         <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary/50">
           <div className="aspect-[3/4] overflow-hidden">
             <img
-              src={book.coverImage}
+              src={book.coverImageUrl}
               alt={book.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
             />
@@ -50,13 +50,13 @@ const BookCard = ({ book, variant = "default" }: BookCardProps) => {
 
   return (
     <Link
-      to={`/book/${book.id}`}
+      to={`/book/${book._id}`}
       className="group block"
     >
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-primary/50">
         <div className="aspect-[3/4] overflow-hidden">
           <img
-            src={book.coverImage}
+            src={book.coverImageUrl}
             alt={book.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
@@ -79,7 +79,7 @@ const BookCard = ({ book, variant = "default" }: BookCardProps) => {
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center gap-1 text-muted-foreground">
               <BookOpen className="h-4 w-4" />
-              <span className="text-sm">{book.availableCopies}/{book.totalCopies}</span>
+              <span className="text-sm">{book.availablecopies}/{book.totalcopies}</span>
             </div>
             <span
               className={cn(
