@@ -115,10 +115,24 @@ const getcurrentlyissuedbooks=async (req,res)=>{
             return res.json({success:false,message:"Not Authenticated"})
         }
         const decode=jwt.verify(token,process.env.JWT_SECRET);
-        const issuedBooks=await IssuedBook.find({userId:decode.id, isreturned:false});
+        const issuedBooks=await IssuedBook.find({userId:decode.id, isreturned:false}).sort({issueDate:-1});
+
         res.json({success:true,message:"Issued Books Fetched",data:issuedBooks})
     }catch(error){
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks};
+const getborrowinghistory=async (req,res)=>{
+    try{
+        const token=req.cookies?.token;
+        if(!token){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        const decode=jwt.verify(token,process.env.JWT_SECRET);
+        const history=await IssuedBook.find({userId:decode.id , isreturned:true}).sort({issueDate:-1});
+        res.json({success:true,message:"Borrowing History Fetched",data:history})
+    }catch(error){
+        console.error("Error fetching borrowing history:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory};
