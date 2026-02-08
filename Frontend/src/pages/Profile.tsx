@@ -93,7 +93,7 @@ const Profile = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Branch</p>
-              <p className="font-semibold text-foreground truncate max-w-[150px]">
+              <p className="font-semibold text-foreground truncate max-w-[150px] uppercase">
                 {student.branch}
               </p>
             </div>
@@ -162,10 +162,10 @@ const Profile = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {new Date(issued.issueDate).toLocaleDateString()}
+                          {new Date(issued.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </TableCell>
                         <TableCell>
-                          {new Date(issued.dueDate).toLocaleDateString()}
+                          {new Date(issued.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </TableCell>
                         <TableCell>
                           <span
