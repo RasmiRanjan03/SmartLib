@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import Student from '../Model/studentmodel.js';
 import Book from '../Model/bookmodel.js';
+import IssuedBook from '../Model/issuedbookmodel.js';
 
 const studentlogin=async (req,res)=>{
     try{
@@ -83,4 +84,28 @@ const getallbooks=async (req,res)=>{
         console.error("Error fetching all books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks};
+const issuebook=async (req,res)=>{
+    try{
+        const {bookId}=req.params;
+        const token=req.cookies?.token;
+        if(!token){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        const decode=jwt.verify(token,process.env.JWT_SECRET);
+        const newissue=new IssuedBook({
+            userId:decode.id,
+            bookId,
+
+        })
+        await newissue.save();
+        const book=await Book.findById(bookId);
+        book.availablecopies-=1;
+        await book.save();
+        return res.json({success:true,message:"Book Issued Successfully"})
+    
+
+    }catch(error){
+        console.error("Error issuing book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+}}
+export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook};
