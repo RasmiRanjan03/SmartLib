@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { set } from 'date-fns';
+import { get } from 'http';
 interface checkauthresponse{
   success:boolean;
   message:string;
@@ -24,6 +25,12 @@ interface AppContextProps {
   issuebook:(bookId:string)=>Promise<void>;
   getcurrentlyissuedbooks:()=>Promise<void>;
   currentlyissuedBooks:currentlyisuuedbook[] | null;
+  borrowingHistory:borrowingHistorybook[] | null;
+  getborrowinghistory:()=>Promise<void>;
+  genres:string[] | null;
+  setgenres:React.Dispatch<React.SetStateAction<string[] | null>>;
+  authors:string[] | null;
+  setauthors:React.Dispatch<React.SetStateAction<string[] | null>>;
 }
 interface student{
   name:string;
@@ -66,10 +73,30 @@ interface currentlyisuuedbook{
   isreturned:boolean;
   fine:number;
 }
+interface borrowingHistorybook{
+  _id:string;
+  userId:string;
+  bookId:string;
+  issueDate:string;
+  dueDate:string;
+  returnDate:string;
+  isreturned:boolean;
+  fine:number;
+}
+interface getborrowinghistoryresponse{
+  success:boolean;
+  message:string;
+  data:borrowingHistorybook[];
+}
 interface getcurrentlyissuedbooksresponse{
   success:boolean;
   message:string;
   data:currentlyisuuedbook[];
+}
+interface getallgenresresponse{
+  success:boolean;
+  message:string;
+  data:string[];
 }
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
@@ -80,6 +107,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [student, setstudent] = useState<student >()
   const [books, setbooks] = useState<book[]>([])
   const [currentlyissuedBooks, setcurrentlyissuedBooks] = useState<currentlyisuuedbook[]>([]);
+  const [borrowingHistory, setborrowingHistory] = useState<borrowingHistorybook[]>([]);
+  const [genres, setgenres] = useState<string[]>(["All Genres"]);
+  const [authors, setauthors] = useState<string[]>(['All Authors']);
   const checkauth=async()=>{
     try{
       const {data}=await axios.get<checkauthresponse>(`${baseUrl}/api/student/checkauth`,{withCredentials:true});
@@ -188,18 +218,56 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         catch(err){
           console.log(err);
         }}
+    const getborrowinghistory=async()=>{
+      try{
+        const {data}=await axios.get<getborrowinghistoryresponse>(`${baseUrl}/api/student/borrowinghistory`,{withCredentials:true});
+        if(data.success){
+          setborrowingHistory(data.data);
+        }else{
+          toast.error("Failed to fetch borrowing history");
+        }
+      }catch(err){
+        console.log(err);
+      }}
+  const getallgenres=async()=>{
+        try{
+          const {data}=await axios.get<getallgenresresponse>(`${baseUrl}/api/student/allgeners`);
+          if(data.success){
+            setgenres([...genres,...data.data]);
+          }else{
+            toast.error("Failed to fetch genres");
+          }
+        }catch(err){
+          console.log(err);
+        }}
+  const getallauthors=async()=>{
+          try{
+            const {data}=await axios.get<getallgenresresponse>(`${baseUrl}/api/student/allauthors`);
+            if(data.success){
+              setauthors([...authors,...data.data]);
+            }else{
+              toast.error("Failed to fetch authors");
+            }
+          }catch(err){
+            console.log(err);
+          }}
+      
   useEffect(() => {
     checkauth();
     getstudentdata();
     getcurrentlyissuedbooks();
+    getborrowinghistory();
+   
 
   }, [token])
   useEffect(() => {
       getallbooks();
+       getallauthors();
+    getallgenres();
      }, [])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks,issuebook,getcurrentlyissuedbooks,currentlyissuedBooks}}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks,issuebook,getcurrentlyissuedbooks,currentlyissuedBooks,borrowingHistory,getborrowinghistory,genres,setgenres,authors,setauthors}}>
       {children}
     </AppContext.Provider>
   );

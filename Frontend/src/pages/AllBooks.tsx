@@ -17,7 +17,7 @@ import { useApp } from "../context/appContext";
 
 const AllBooks = () => {
  
-  const { books } = useApp();
+  const { books,genres,authors } = useApp();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
@@ -25,6 +25,7 @@ const AllBooks = () => {
   const [selectedAvailability, setSelectedAvailability] = useState("all");
   const [selectedRating, setSelectedRating] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  console.log(genres)
 if (!books) {
     return (
       <Layout>

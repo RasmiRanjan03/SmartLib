@@ -1,5 +1,5 @@
 import express from 'express';
-import { studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory } from '../controller/studentcontoller.js';
+import { studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory,getallauthors,getallgeners } from '../controller/studentcontoller.js';
 import studentAuth from '../middleware/studentauth.js';
 import multer from 'multer';
 
@@ -12,4 +12,6 @@ router.get('/allbooks',getallbooks)
 router.post('/issuebook/:bookId',studentAuth,issuebook)
 router.get('/currentlyissuedbooks',studentAuth,getcurrentlyissuedbooks)
 router.get('/borrowinghistory',studentAuth,getborrowinghistory)
+router.get('/allgeners',getallgeners)
+router.get('/allauthors',getallauthors)
 export default router;

@@ -10,12 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {   borrowingHistory } from "@/data/mockData";
 import {useApp} from "../context/appContext";
 
 
 const Profile = () => {
-  const { token, student, currentlyissuedBooks,books } = useApp();
+  const { token, student, currentlyissuedBooks,books,borrowingHistory } = useApp();
   const totalFine = [...currentlyissuedBooks, ...borrowingHistory].reduce(
     (sum, book) => sum + book.fine,
     0
@@ -223,7 +222,7 @@ const Profile = () => {
                   {borrowingHistory.map((history) => {
                     const book = books.find((b) => b._id === history.bookId);
                     return (
-                      <TableRow key={history.id}>
+                      <TableRow key={history._id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {book && (
@@ -235,7 +234,7 @@ const Profile = () => {
                             )}
                             <div>
                               <p className="font-medium text-foreground">
-                                {history.bookTitle}
+                                {book?.title || "Unknown Book"}
                               </p>
                               {book && (
                                 <p className="text-sm text-muted-foreground">
@@ -246,14 +245,14 @@ const Profile = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {new Date(history.issueDate).toLocaleDateString()}
+                          {new Date(history.issueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </TableCell>
                         <TableCell>
-                          {new Date(history.dueDate).toLocaleDateString()}
+                          {new Date(history.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </TableCell>
                         <TableCell>
                           {history.returnDate
-                            ? new Date(history.returnDate).toLocaleDateString()
+                            ? new Date(history.returnDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right">

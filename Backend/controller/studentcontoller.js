@@ -135,4 +135,20 @@ const getborrowinghistory=async (req,res)=>{
         console.error("Error fetching borrowing history:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory};
+const getallgeners=async (req,res)=>{
+    try{
+        const books=await Book.distinct("genre");
+        res.json({success:true,message:"All Genres Fetched",data:books})
+    }catch(error){
+        console.error("Error fetching all geners:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+const getallauthors=async (req,res)=>{
+    try{
+        const books=await Book.distinct("author");
+        res.json({success:true,message:"All Authors Fetched",data:books})
+    }catch(error){
+        console.error("Error fetching all authors:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory,getallgeners,getallauthors};

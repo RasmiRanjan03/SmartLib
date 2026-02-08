@@ -190,64 +190,6 @@ export const currentStudent: Student = {
   email: "john.doe@college.edu"
 };
 
-export const issuedBooks: IssuedBook[] = [
-  {
-    id: "ISS001",
-    userId: "STU001",
-    bookId: "1",
-    bookTitle: "Introduction to Algorithms",
-    issueDate: "2024-01-20",
-    dueDate: "2026-01-29",
-    isreturned: false,
-    fine: 80
-  },
-  {
-    id: "ISS002",
-    userId: "STU001",
-    bookId: "4",
-    bookTitle: "The Pragmatic Programmer",
-    issueDate: "2024-01-15",
-    dueDate: "2024-01-29",
-    isreturned: false,
-    fine: 50
-  }
-];
-
-export const borrowingHistory: IssuedBook[] = [
-  {
-    id: "ISS003",
-    userId: "STU001",
-    bookId: "5",
-    bookTitle: "Database System Concepts",
-    issueDate: "2023-12-01",
-    dueDate: "2023-12-15",
-    returnDate: "2023-12-14",
-    isreturned: true,
-    fine: 0
-  },
-  {
-    id: "ISS004",
-    userId: "STU001",
-    bookId: "7",
-    bookTitle: "Computer Networks",
-    issueDate: "2023-11-10",
-    dueDate: "2023-11-24",
-    returnDate: "2023-11-26",
-    isreturned: true,
-    fine: 20
-  },
-  {
-    id: "ISS005",
-    userId: "STU001",
-    bookId: "8",
-    bookTitle: "Operating System Concepts",
-    issueDate: "2023-10-05",
-    dueDate: "2023-10-19",
-    returnDate: "2023-10-18",
-    isreturned: true,
-    fine: 0
-  }
-];
 
 export const genres = [
   "All Genres",

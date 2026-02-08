@@ -2,7 +2,6 @@ import { BookOpen, BookCheck, AlertTriangle, DollarSign, Clock } from "lucide-re
 import Layout from "@/components/Layout";
 import SummaryCard from "@/components/SummaryCard";
 import BookCard from "@/components/BookCard";
-import {  issuedBooks } from "@/data/mockData";
 import { useApp } from "../context/appContext";
 import { useNavigate } from "react-router-dom";
 
