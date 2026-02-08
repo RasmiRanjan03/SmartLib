@@ -21,6 +21,7 @@ interface AppContextProps {
   books:book[] | null;
   setbooks:React.Dispatch<React.SetStateAction<book[] | null>>;
   getallbooks:()=>Promise<void>;
+  issuebook:(bookId:string)=>Promise<void>;
 }
 interface student{
   name:string;
@@ -144,6 +145,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.log(err);
     }
   }
+  const issuebook=async(bookId:string)=>{
+    try{
+      const {data}=await axios.post(`${baseUrl}/api/student/issuebook/${bookId}`,{},{withCredentials:true});
+      if(data.success){
+        toast.success("Book issued successfully!");
+        getallbooks(); // Refresh book list to update availability
+      }else{
+        toast.error("Failed to issue book");
+      }
+    }catch(err){
+      toast.error("Failed to issue book");
+      console.log(err);
+    }}
   useEffect(() => {
     checkauth();
     getstudentdata();
@@ -154,7 +168,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
      }, [])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks}}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks,issuebook}}>
       {children}
     </AppContext.Provider>
   );

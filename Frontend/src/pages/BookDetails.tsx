@@ -7,7 +7,7 @@ import { useApp } from "../context/appContext";
 import { toast } from "sonner";
 
 const BookDetails = () => {
-  const { books } = useApp();
+  const { books,issuebook } = useApp();
   const { bookId } = useParams<{ bookId: string }>();
   const book = books.find((b) => b._id === bookId);
 
@@ -35,9 +35,11 @@ const BookDetails = () => {
     .filter((b) => b._id !== book._id && b.genre === book.genre)
     .slice(0, 5);
 
-  const handleIssueBook = () => {
+  const handleIssueBook = async() => {
     if (isAvailable) {
+      await issuebook(book._id);
       toast.success(`"${book.title}" has been added to your issued books!`);
+      
     } else {
       toast.error("This book is currently unavailable.");
     }
@@ -179,10 +181,10 @@ const BookDetails = () => {
                       <p className="font-semibold text-destructive">
                         Currently Unavailable
                       </p>
-                      {book.expectedAvailability && (
+                      {(
                         <p className="text-sm text-muted-foreground mt-1">
                           Expected availability:{" "}
-                          {new Date(book.expectedAvailability).toLocaleDateString()}
+                          {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')}
                         </p>
                       )}
                     </div>
