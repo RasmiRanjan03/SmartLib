@@ -10,16 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {  issuedBooks, borrowingHistory, books } from "@/data/mockData";
+import {   borrowingHistory } from "@/data/mockData";
 import {useApp} from "../context/appContext";
 
 
 const Profile = () => {
-  const totalFine = [...issuedBooks, ...borrowingHistory].reduce(
+  const { token, student, currentlyissuedBooks,books } = useApp();
+  const totalFine = [...currentlyissuedBooks, ...borrowingHistory].reduce(
     (sum, book) => sum + book.fine,
     0
   );
-  const { token, student } = useApp();
 
   if (!student) {
     return (
@@ -122,7 +122,7 @@ const Profile = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {issuedBooks.length > 0 ? (
+          {currentlyissuedBooks.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -135,11 +135,11 @@ const Profile = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {issuedBooks.map((issued) => {
+                  {currentlyissuedBooks.map((issued) => {
                     const book = books.find((b) => b._id === issued.bookId);
                     const isOverdue = new Date(issued.dueDate) < new Date();
                     return (
-                      <TableRow key={issued.id}>
+                      <TableRow key={issued._id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {book && (
@@ -151,7 +151,7 @@ const Profile = () => {
                             )}
                             <div>
                               <p className="font-medium text-foreground">
-                                {issued.bookTitle}
+                                {book.title}
                               </p>
                               {book && (
                                 <p className="text-sm text-muted-foreground">
