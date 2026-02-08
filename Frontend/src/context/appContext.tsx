@@ -22,6 +22,8 @@ interface AppContextProps {
   setbooks:React.Dispatch<React.SetStateAction<book[] | null>>;
   getallbooks:()=>Promise<void>;
   issuebook:(bookId:string)=>Promise<void>;
+  getcurrentlyissuedbooks:()=>Promise<void>;
+  currentlyissuedBooks:currentlyisuuedbook[] | null;
 }
 interface student{
   name:string;
@@ -55,6 +57,20 @@ interface getallbooksresponse{
   message:string;
   data:book[];
 }
+interface currentlyisuuedbook{
+  _id:string;
+  userId:string;
+  bookId:string;
+  issueDate:string;
+  dueDate:string;
+  isreturned:boolean;
+  fine:number;
+}
+interface getcurrentlyissuedbooksresponse{
+  success:boolean;
+  message:string;
+  data:currentlyisuuedbook[];
+}
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -63,6 +79,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [token, settoken] = useState<Boolean>(false)
   const [student, setstudent] = useState<student >()
   const [books, setbooks] = useState<book[]>([])
+  const [currentlyissuedBooks, setcurrentlyissuedBooks] = useState<currentlyisuuedbook[]>([]);
   const checkauth=async()=>{
     try{
       const {data}=await axios.get<checkauthresponse>(`${baseUrl}/api/student/checkauth`,{withCredentials:true});
@@ -150,7 +167,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const {data}=await axios.post(`${baseUrl}/api/student/issuebook/${bookId}`,{},{withCredentials:true});
       if(data.success){
         toast.success("Book issued successfully!");
-        getallbooks(); // Refresh book list to update availability
+        getallbooks();
+        getcurrentlyissuedbooks(); // Refresh book list to update availability
       }else{
         toast.error("Failed to issue book");
       }
@@ -158,9 +176,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       toast.error("Failed to issue book");
       console.log(err);
     }}
+    const getcurrentlyissuedbooks=async()=>{
+      try{
+        const {data}=await axios.get<getcurrentlyissuedbooksresponse>(`${baseUrl}/api/student/currentlyissuedbooks`,{withCredentials:true});
+        if(data.success){
+          setcurrentlyissuedBooks(data.data);
+        }else{
+          toast.error("Failed to fetch issued books");
+        }
+      }
+        catch(err){
+          console.log(err);
+        }}
   useEffect(() => {
     checkauth();
     getstudentdata();
+    getcurrentlyissuedbooks();
 
   }, [token])
   useEffect(() => {
@@ -168,11 +199,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
      }, [])
 
   return (
-    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks,issuebook}}>
+    <AppContext.Provider value={{ baseUrl, token, settoken, checkauth, login,logout, student, getstudentdata ,setstudent,books,getallbooks,setbooks,issuebook,getcurrentlyissuedbooks,currentlyissuedBooks}}>
       {children}
     </AppContext.Provider>
   );
 };
+
 
 export const useApp = () => {
   const context = useContext(AppContext);

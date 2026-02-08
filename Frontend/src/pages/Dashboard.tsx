@@ -2,24 +2,23 @@ import { BookOpen, BookCheck, AlertTriangle, DollarSign, Clock } from "lucide-re
 import Layout from "@/components/Layout";
 import SummaryCard from "@/components/SummaryCard";
 import BookCard from "@/components/BookCard";
-import {  issuedBooks, currentStudent } from "@/data/mockData";
+import {  issuedBooks } from "@/data/mockData";
 import { useApp } from "../context/appContext";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   // Calculate summary data
-  const {books,student}=useApp();
+  const {books,student,currentlyissuedBooks}=useApp();
   const totalBooks = books.length;
-  const booksIssuedByStudent = issuedBooks.length;
-  const overdueBooks = issuedBooks.filter(
-    (book) => new Date(book.dueDate) < new Date() && !book.returnDate
+  const booksIssuedByStudent = currentlyissuedBooks.length;
+  const overdueBooks = currentlyissuedBooks.filter(
+    (book) => new Date(book.dueDate) < new Date() && !book.isreturned
   ).length;
-  const totalFine = issuedBooks.reduce((sum, book) => sum + book.fine, 0);
+  const totalFine = currentlyissuedBooks.reduce((sum, book) => sum + book.fine, 0);
   const recentBooks = [...books].sort(
     (a, b) => new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime()
   ).slice(0, 6);
-  console.log(books)
 
    if (!student || !books) {
     return (
@@ -71,19 +70,19 @@ const Dashboard = () => {
       </div>
 
       {/* Currently Issued Section */}
-      {issuedBooks.length > 0 && (
+      {currentlyissuedBooks.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-semibold text-foreground">Currently Issued</h2>
           </div>
           <div className="grid gap-4">
-            {issuedBooks.map((issued) => {
+            {currentlyissuedBooks.map((issued) => {
               const book = books.find((b) => b._id === issued.bookId);
               const isOverdue = new Date(issued.dueDate) < new Date();
               return (
                 <div
-                  key={issued.id}
+                  key={issued._id}
                   className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card shadow-sm"
                 >
                   {book && (
@@ -94,9 +93,9 @@ const Dashboard = () => {
                     />
                   )}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{issued.bookTitle}</h3>
+                    <h3 className="font-semibold text-foreground">{book.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Due: {new Date(issued.dueDate).toLocaleDateString()}
+                      Due: {new Date(issued.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
                   <div className="text-right">

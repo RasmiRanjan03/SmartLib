@@ -108,4 +108,17 @@ const issuebook=async (req,res)=>{
         console.error("Error issuing book:", error);
         res.json({success:false,message:"Internal Server Error"})
 }}
-export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook};
+const getcurrentlyissuedbooks=async (req,res)=>{
+    try{
+        const token=req.cookies?.token;
+        if(!token){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        const decode=jwt.verify(token,process.env.JWT_SECRET);
+        const issuedBooks=await IssuedBook.find({userId:decode.id, isreturned:false});
+        res.json({success:true,message:"Issued Books Fetched",data:issuedBooks})
+    }catch(error){
+        console.error("Error fetching issued books:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks};
