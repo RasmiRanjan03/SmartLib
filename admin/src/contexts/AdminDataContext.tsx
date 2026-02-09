@@ -22,6 +22,7 @@ interface AdminDataContextType {
   adminlogin: (email: string, password: string) => void;
   logoutadmin:()=>void;
   getstudents:()=>void;
+  getissuedbooks:()=>void;
 }
 interface responce{
   success: boolean;
@@ -37,6 +38,11 @@ interface studentsresponce{
 interface booksresponce{
   success: boolean;
   books?: Book[];
+  message?: string;
+}
+interface issuedbooksresponce{
+  success: boolean;
+  issuedBooks?: IssuedBook[];
   message?: string;
 }
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
@@ -120,6 +126,19 @@ const logoutadmin=async()=>{
       toast.error("Failed to fetch books. Please try again.");
     }
   }
+  const getissuedbooks=async()=>{
+    try{
+      const {data}=await axios.get<issuedbooksresponce>(backendUrl+"admin/getissuedbooks",{withCredentials:true});
+      if(data.success && data.issuedBooks){
+        setIssuedBooks(data.issuedBooks);
+      }else{
+        toast.error(data.message || "Failed to fetch issued books.");
+      }
+    }catch(err){ 
+      console.log(err);
+      toast.error("Failed to fetch issued books. Please try again.");
+    }
+  }
   const calculateStats = (): DashboardStats => {
     const today = new Date();
     const overdueBooks = issuedBooks.filter(
@@ -187,7 +206,7 @@ const logoutadmin=async()=>{
     dueDate.setDate(dueDate.getDate() + 14); // 14 days lending period
 
     const newIssue: IssuedBook = {
-      id: `${Date.now()}`,
+      _id: `${Date.now()}`,
       userId: studentId,
       bookId,
       bookTitle: book.title,
@@ -207,7 +226,7 @@ const logoutadmin=async()=>{
   };
 
   const returnBook = (issueId: string) => {
-    const issue = issuedBooks.find((i) => i.id === issueId);
+    const issue = issuedBooks.find((i) => i._id === issueId);
     if (!issue) return;
 
     const today = new Date();
@@ -221,7 +240,7 @@ const logoutadmin=async()=>{
 
     setIssuedBooks((prev) =>
       prev.map((i) =>
-        i.id === issueId
+        i._id === issueId
           ? { ...i, isreturned: true, returnDate: today.toISOString().split('T')[0], fine }
           : i
       )
@@ -237,6 +256,7 @@ useEffect(() => {
   checkadmin();
   getstudents();
   getbooks();
+  getissuedbooks();
 }, [atoken])
 
   return (
@@ -257,6 +277,7 @@ useEffect(() => {
         returnBook,
         adminlogin,
         logoutadmin,
+        getissuedbooks,
         getstudents
       }}
     >

@@ -1,5 +1,6 @@
 import Student from "../Model/studentmodel.js";
 import Book from "../Model/bookmodel.js";
+import IssuedBook from "../Model/issuedbookmodel.js";
 import {v2 as cloudinary} from 'cloudinary';
 import jwt from 'jsonwebtoken';
 import env from 'dotenv';
@@ -139,4 +140,12 @@ const getallbooks=async (req,res)=>{
         console.error("Error fetching books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks};
+const getissuedbooks=async (req,res)=>{
+    try{
+        const issuedBooks=await IssuedBook.find();
+        res.json({success:true,issuedBooks})
+    }catch(error){
+        console.error("Error fetching issued books:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks};

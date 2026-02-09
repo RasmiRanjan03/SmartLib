@@ -26,7 +26,7 @@ export interface Book {
 }
 
 export interface IssuedBook {
-  id: string;
+  _id: string;
   userId: string;
   bookId: string;
   bookTitle: string;

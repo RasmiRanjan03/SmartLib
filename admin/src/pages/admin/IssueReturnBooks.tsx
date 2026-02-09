@@ -104,40 +104,44 @@ export const IssueReturnBooks = () => {
           </tr>
         </thead>
         <tbody>
-          {issues.map((issue) => (
-            <tr key={issue.id}>
-              <td className="font-medium">{issue.studentName}</td>
-              <td className="max-w-[150px] truncate">{issue.bookTitle}</td>
-              <td className="text-muted-foreground">{formatDate(issue.issueDate)}</td>
-              <td className="text-muted-foreground">{formatDate(issue.dueDate)}</td>
-              <td className="text-muted-foreground">
-                {issue.returnDate ? formatDate(issue.returnDate) : '-'}
-              </td>
-              <td>
-                {issue.fine > 0 ? (
-                  <span className="text-destructive font-medium">${issue.fine}</span>
-                ) : (
-                  <span className="text-muted-foreground">$0</span>
-                )}
-              </td>
-              <td>{getStatusBadge(issue)}</td>
-              <td>
-                <div className="flex justify-end">
-                  {!issue.isreturned && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleReturnClick(issue.id)}
-                      className="gap-1"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      Return
-                    </Button>
+          {issues.map((issue) => {
+            const book = books.find((b) => b._id === issue.bookId);
+            const student = students.find((s) => s._id === issue.userId);
+            return (
+              <tr key={issue._id}>
+                <td className="font-medium">{student ? student.name : issue.studentName}</td>
+                <td className="max-w-[150px] truncate">{book ? book.title : issue.bookTitle}</td>
+                <td className="text-muted-foreground">{formatDate(issue.issueDate)}</td>
+                <td className="text-muted-foreground">{formatDate(issue.dueDate)}</td>
+                <td className="text-muted-foreground">
+                  {issue.returnDate ? formatDate(issue.returnDate) : '-'}
+                </td>
+                <td>
+                  {issue.fine > 0 ? (
+                    <span className="text-destructive font-medium">${issue.fine}</span>
+                  ) : (
+                    <span className="text-muted-foreground">$0</span>
                   )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>{getStatusBadge(issue)}</td>
+                <td>
+                  <div className="flex justify-end">
+                    {!issue.isreturned && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleReturnClick(issue._id)}
+                        className="gap-1"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        Return
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
           {issues.length === 0 && (
             <tr>
               <td colSpan={8} className="text-center py-8 text-muted-foreground">
@@ -242,8 +246,8 @@ export const IssueReturnBooks = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {students.map((student) => (
-                    <SelectItem key={student.id} value={student.id}>
-                      {student.name} ({student.registrationNumber})
+                    <SelectItem key={student._id} value={student._id}>
+                      {student.name} ({student.redg})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -300,7 +304,7 @@ export const IssueReturnBooks = () => {
             <AlertDialogDescription>
               Are you sure you want to mark this book as returned?
               {selectedIssueId && (() => {
-                const issue = issuedBooks.find((i) => i.id === selectedIssueId);
+                const issue = issuedBooks.find((i) => i._id === selectedIssueId);
                 if (issue) {
                   const dueDate = new Date(issue.dueDate);
                   if (dueDate < today) {
