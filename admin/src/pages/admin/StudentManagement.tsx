@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const initialFormData = {
   name: '',
-  registrationNumber: '',
+  redg: '',
   course: '',
   branch: '',
   email: '',
@@ -45,7 +45,7 @@ export const StudentManagement = () => {
   const filteredStudents = students.filter(
     (student) =>
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.redg.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -54,7 +54,7 @@ export const StudentManagement = () => {
       setEditingStudent(student);
       setFormData({
         name: student.name,
-        registrationNumber: student.registrationNumber,
+        redg: student.redg,
         course: student.course,
         branch: student.branch,
         email: student.email,
@@ -77,7 +77,7 @@ export const StudentManagement = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingStudent) {
-      updateStudent(editingStudent.id, formData);
+      updateStudent(editingStudent._id, formData);
     } else {
       addStudent(formData);
     }
@@ -91,7 +91,7 @@ export const StudentManagement = () => {
 
   const handleConfirmDelete = () => {
     if (studentToDelete) {
-      deleteStudent(studentToDelete.id);
+      deleteStudent(studentToDelete._id);
     }
     setIsDeleteDialogOpen(false);
     setStudentToDelete(null);
@@ -139,7 +139,7 @@ export const StudentManagement = () => {
             </thead>
             <tbody>
               {filteredStudents.map((student) => (
-                <tr key={student.id}>
+                <tr key={student._id}>
                   <td>
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={student.image} alt={student.name} />
@@ -154,7 +154,7 @@ export const StudentManagement = () => {
                   </td>
                   <td className="font-medium">{student.name}</td>
                   <td>
-                    <span className="status-badge-info">{student.registrationNumber}</span>
+                    <span className="status-badge-info">{student.redg}</span>
                   </td>
                   <td>{student.course}</td>
                   <td>{student.branch}</td>
@@ -213,12 +213,12 @@ export const StudentManagement = () => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="registrationNumber">Registration Number</Label>
+                <Label htmlFor="redg">Registration Number</Label>
                 <Input
-                  id="registrationNumber"
-                  value={formData.registrationNumber}
+                  id="redg"
+                  value={formData.redg}
                   onChange={(e) =>
-                    setFormData({ ...formData, registrationNumber: e.target.value })
+                    setFormData({ ...formData, redg: e.target.value })
                   }
                   required
                 />

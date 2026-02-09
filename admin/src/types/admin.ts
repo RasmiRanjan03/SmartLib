@@ -1,7 +1,7 @@
 export interface Student {
   _id: string;
   name: string;
-  registrationNumber: string;
+  redg: string;
   course: string;
   branch: string;
   image: string;

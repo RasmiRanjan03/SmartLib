@@ -10,7 +10,7 @@ interface AdminDataContextType {
   books: Book[];
   issuedBooks: IssuedBook[];
   stats: DashboardStats;
-  addStudent: (student: Omit<Student, 'id'>) => void;
+  addStudent: (student: Omit<Student, '_id'>) => void;
   updateStudent: (id: string, student: Partial<Student>) => void;
   deleteStudent: (id: string) => void;
   addBook: (book: Omit<Book, '_id' | 'addedDate' | 'rating' | 'reviewCount'>) => void;
@@ -20,12 +20,18 @@ interface AdminDataContextType {
   returnBook: (issueId: string) => void;
   adminlogin: (email: string, password: string) => void;
   logoutadmin:()=>void;
+  getstudents:()=>void;
 }
 interface responce{
   success: boolean;
   token?: string;
   message?: string;
   data:string[];
+}
+interface studentsresponce{
+  success: boolean;
+  students?: Student[];
+  message?: string;
 }
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
@@ -40,7 +46,7 @@ export const useAdminData = () => {
 export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const backendUrl = "http://localhost:4000/api/";
   const [atoken, setAtoken] = useState(false);
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>(mockIssuedBooks);
 
@@ -82,7 +88,19 @@ const logoutadmin=async()=>{
       setAtoken(false);
     }
   };
-  
+  const getstudents=async()=>{
+    try{
+      const {data}=await axios.get<studentsresponce>(backendUrl+"admin/getstudents",{withCredentials:true});
+      if(data.success && data.students){
+        setStudents(data.students);
+      }else{
+        toast.error(data.message || "Failed to fetch students.");
+      }
+    }catch(err){ 
+      console.log(err);
+      toast.error("Failed to fetch students. Please try again.");
+    }
+  }
   const calculateStats = (): DashboardStats => {
     const today = new Date();
     const overdueBooks = issuedBooks.filter(
@@ -118,7 +136,7 @@ const logoutadmin=async()=>{
     setStudents((prev) => prev.filter((student) => student._id !== _id));
   };
 
-  const addBook = (book: Omit<Book, '__id' | 'addedDate' | 'rating' | 'reviewCount'>) => {
+  const addBook = (book: Omit<Book, '_id' | 'addedDate' | 'rating' | 'reviewCount'>) => {
     const newBook: Book = {
       ...book,
       _id: `${Date.now()}`,
@@ -198,6 +216,7 @@ const logoutadmin=async()=>{
   };
 useEffect(() => {
   checkadmin();
+  getstudents();
 }, [atoken])
 
   return (
@@ -217,7 +236,8 @@ useEffect(() => {
         issueBook,
         returnBook,
         adminlogin,
-        logoutadmin
+        logoutadmin,
+        getstudents
       }}
     >
       {children}
