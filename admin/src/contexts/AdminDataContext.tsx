@@ -27,7 +27,7 @@ export const useAdminData = () => {
   return context;
 };
 
-export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const [students, setStudents] = useState<Student[]>(mockStudents);
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>(mockIssuedBooks);
@@ -49,25 +49,25 @@ export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
   };
 
-  const addStudent = (student: Omit<Student, 'id'>) => {
+  const addStudent = (student: Omit<Student, '_id'>) => {
     const newStudent: Student = {
       ...student,
-      id: `${Date.now()}`,
+      _id: `${Date.now()}`,
     };
     setStudents((prev) => [...prev, newStudent]);
   };
 
-  const updateStudent = (id: string, studentData: Partial<Student>) => {
+  const updateStudent = (_id: string, studentData: Partial<Student>) => {
     setStudents((prev) =>
-      prev.map((student) => (student.id === id ? { ...student, ...studentData } : student))
+      prev.map((student) => (student._id === _id ? { ...student, ...studentData } : student))
     );
   };
 
-  const deleteStudent = (id: string) => {
-    setStudents((prev) => prev.filter((student) => student.id !== id));
+  const deleteStudent = (_id: string) => {
+    setStudents((prev) => prev.filter((student) => student._id !== _id));
   };
 
-  const addBook = (book: Omit<Book, '_id' | 'addedDate' | 'rating' | 'reviewCount'>) => {
+  const addBook = (book: Omit<Book, '__id' | 'addedDate' | 'rating' | 'reviewCount'>) => {
     const newBook: Book = {
       ...book,
       _id: `${Date.now()}`,
@@ -78,18 +78,18 @@ export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children 
     setBooks((prev) => [...prev, newBook]);
   };
 
-  const updateBook = (id: string, bookData: Partial<Book>) => {
+  const updateBook = (_id: string, bookData: Partial<Book>) => {
     setBooks((prev) =>
-      prev.map((book) => (book._id === id ? { ...book, ...bookData } : book))
+      prev.map((book) => (book._id === _id ? { ...book, ...bookData } : book))
     );
   };
 
-  const deleteBook = (id: string) => {
-    setBooks((prev) => prev.filter((book) => book._id !== id));
+  const deleteBook = (_id: string) => {
+    setBooks((prev) => prev.filter((book) => book._id !== _id));
   };
 
   const issueBook = (studentId: string, bookId: string) => {
-    const student = students.find((s) => s.id === studentId);
+    const student = students.find((s) => s._id === studentId);
     const book = books.find((b) => b._id === bookId);
 
     if (!student || !book || book.availablecopies <= 0) return;

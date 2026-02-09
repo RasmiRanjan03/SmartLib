@@ -1,6 +1,9 @@
 import Student from "../Model/studentmodel.js";
 import Book from "../Model/bookmodel.js";
 import {v2 as cloudinary} from 'cloudinary';
+import jwt from 'jsonwebtoken';
+import env from 'dotenv';
+env.config();
 const addstudent=async (req,res)=>{
     try{
         const {name,email,course,branch,redg,password}=req.body;
@@ -70,4 +73,38 @@ const addbook=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
-export {addstudent,addbook};
+const loginadmin=(req,res)=>{
+    try{
+
+        const {email,password}=req.body;
+        if(!email || !password){
+            return res.json({success:false,message:"Email and Password must be required"})
+        }
+        
+        if(email==process.env.admin_email && password==process.env.password){
+            const atoken=jwt.sign({email},process.env.JWT_SECRET,{expiresIn:'1h'});
+            res.cookie('atoken', atoken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path:'/',
+            maxAge: 60 * 60 * 1000
+        });
+            res.json({success:true,message:"Admin Login Successful"})
+        }else{
+            res.json({success:false,message:"Invalid Admin Credentials"})
+        }
+    }catch(error){
+        console.error("Error logging in admin:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }
+}
+const getallstudents=async (req,res)=>{
+    try{
+        const students=await Student.find();
+        res.json({success:true,students})
+    }catch(error){
+        console.error("Error fetching students:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {addstudent,addbook,getallstudents,loginadmin};

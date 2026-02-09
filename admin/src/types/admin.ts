@@ -1,5 +1,5 @@
 export interface Student {
-  id: string;
+  _id: string;
   name: string;
   registrationNumber: string;
   course: string;
