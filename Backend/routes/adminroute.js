@@ -5,7 +5,7 @@ import upload from '../middleware/multer.js';
 const router=express.Router();
 
 router.post('/addstudent',upload.single('profilepicurl'),adminAuth,addstudent);
-router.post('/addbook',upload.single('coverImageurl'),adminAuth,addbook);
+router.post('/addbook',upload.single('coverImageUrl'),adminAuth,addbook);
 router.post('/adminlogin',loginadmin);
 router.get('/checkadmin',checkadmin);
 router.get('/logoutadmin',logoutadmin);
