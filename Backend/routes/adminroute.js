@@ -1,4 +1,4 @@
-import {addstudent,addbook,loginadmin,checkadmin,logoutadmin,getallstudents} from "../controller/admincontroller.js";
+import {addstudent,addbook,loginadmin,checkadmin,logoutadmin,getallstudents,getallbooks} from "../controller/admincontroller.js";
 import adminAuth from "../middleware/adminauth.js";
 import express from 'express';
 import upload from '../middleware/multer.js';
@@ -10,5 +10,6 @@ router.post('/adminlogin',loginadmin);
 router.get('/checkadmin',checkadmin);
 router.get('/logoutadmin',logoutadmin);
 router.get('/getstudents',adminAuth,getallstudents)
+router.get('/getbooks',adminAuth,getallbooks)
 
 export default router;

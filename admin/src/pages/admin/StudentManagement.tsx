@@ -29,7 +29,7 @@ const initialFormData = {
   course: '',
   branch: '',
   email: '',
-  image: '',
+  profilepicurl: '',
   password: '',
 };
 
@@ -58,7 +58,7 @@ export const StudentManagement = () => {
         course: student.course,
         branch: student.branch,
         email: student.email,
-        image: student.image,
+        profilepicurl: student.profilepicurl,
         password: student.password,
       });
     } else {
@@ -142,7 +142,7 @@ export const StudentManagement = () => {
                 <tr key={student._id}>
                   <td>
                     <Avatar className="w-10 h-10">
-                      <AvatarImage src={student.image} alt={student.name} />
+                      <AvatarImage src={student.profilepicurl} alt={student.name} />
                       <AvatarFallback>
                         {student.name
                           .split(' ')
@@ -256,10 +256,10 @@ export const StudentManagement = () => {
               <div className="grid gap-2">
                 <Label htmlFor="image">Profile Image URL</Label>
                 <Input
-                  id="image"
+                  id="profilepicurl"
                   type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  value={formData.profilepicurl}
+                  onChange={(e) => setFormData({ ...formData, profilepicurl: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                 />
               </div>

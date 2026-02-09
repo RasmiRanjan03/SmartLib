@@ -1,57 +1,5 @@
-import { Student, Book, IssuedBook } from '@/types/admin';
+import {  Book, IssuedBook } from '@/types/admin';
 
-export const mockStudents: Student[] = [
-  {
-    id: '1',
-    name: 'John Smith',
-    registrationNumber: 'STU2024001',
-    course: 'Computer Science',
-    branch: 'Software Engineering',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces',
-    email: 'john.smith@university.edu',
-    password: 'password123',
-  },
-  {
-    id: '2',
-    name: 'Emily Johnson',
-    registrationNumber: 'STU2024002',
-    course: 'Information Technology',
-    branch: 'Data Science',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces',
-    email: 'emily.johnson@university.edu',
-    password: 'password123',
-  },
-  {
-    id: '3',
-    name: 'Michael Brown',
-    registrationNumber: 'STU2024003',
-    course: 'Electronics',
-    branch: 'Embedded Systems',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces',
-    email: 'michael.brown@university.edu',
-    password: 'password123',
-  },
-  {
-    id: '4',
-    name: 'Sarah Davis',
-    registrationNumber: 'STU2024004',
-    course: 'Computer Science',
-    branch: 'Artificial Intelligence',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces',
-    email: 'sarah.davis@university.edu',
-    password: 'password123',
-  },
-  {
-    id: '5',
-    name: 'David Wilson',
-    registrationNumber: 'STU2024005',
-    course: 'Mechanical Engineering',
-    branch: 'Robotics',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces',
-    email: 'david.wilson@university.edu',
-    password: 'password123',
-  },
-];
 
 export const mockBooks: Book[] = [
   {

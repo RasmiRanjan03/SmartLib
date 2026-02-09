@@ -131,4 +131,12 @@ const getallstudents=async (req,res)=>{
         console.error("Error fetching students:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin};
+const getallbooks=async (req,res)=>{
+    try{
+        const books=await Book.find();
+        res.json({success:true,books})
+    }catch(error){
+        console.error("Error fetching books:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks};

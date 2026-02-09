@@ -4,7 +4,7 @@ export interface Student {
   redg: string;
   course: string;
   branch: string;
-  image: string;
+  profilepicurl: string;
   email: string;
   password: string;
 }

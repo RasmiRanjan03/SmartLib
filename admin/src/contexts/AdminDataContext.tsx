@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode,useEffect } from 'react';
 import { Student, Book, IssuedBook, DashboardStats } from '@/types/admin';
-import { mockStudents, mockBooks, mockIssuedBooks } from '@/data/mockData';
+import { mockBooks, mockIssuedBooks } from '@/data/mockData';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { get } from 'http';
 
 interface AdminDataContextType {
   atoken: boolean ;
@@ -33,6 +34,11 @@ interface studentsresponce{
   students?: Student[];
   message?: string;
 }
+interface booksresponce{
+  success: boolean;
+  books?: Book[];
+  message?: string;
+}
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
 export const useAdminData = () => {
@@ -47,7 +53,7 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const backendUrl = "http://localhost:4000/api/";
   const [atoken, setAtoken] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
-  const [books, setBooks] = useState<Book[]>(mockBooks);
+  const [books, setBooks] = useState<Book[]>([]);
   const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>(mockIssuedBooks);
 
   const adminlogin = async (email: string, password: string) => {
@@ -99,6 +105,19 @@ const logoutadmin=async()=>{
     }catch(err){ 
       console.log(err);
       toast.error("Failed to fetch students. Please try again.");
+    }
+  }
+  const getbooks=async()=>{
+    try{
+      const {data}=await axios.get<booksresponce>(backendUrl+"admin/getbooks",{withCredentials:true});
+      if(data.success && data.books){
+        setBooks(data.books);
+      }else{
+        toast.error(data.message || "Failed to fetch books.");
+      }
+    }catch(err){ 
+      console.log(err);
+      toast.error("Failed to fetch books. Please try again.");
     }
   }
   const calculateStats = (): DashboardStats => {
@@ -217,6 +236,7 @@ const logoutadmin=async()=>{
 useEffect(() => {
   checkadmin();
   getstudents();
+  getbooks();
 }, [atoken])
 
   return (
