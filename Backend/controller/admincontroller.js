@@ -8,7 +8,10 @@ env.config();
 const addstudent=async (req,res)=>{
     try{
         const {name,email,course,branch,redg,password}=req.body;
-        const image=req.file;
+        const profilepicurl=req.file;
+        if (!profilepicurl) {
+            return res.json({ success: false, message: "Profile picture is required" });
+        }
         if(!name){
             return res.json({success:false,message:"Name Must be required"})
         }
@@ -27,7 +30,7 @@ const addstudent=async (req,res)=>{
         if(!course && !branch){
             return res.json({success:false,message:"Course and Branch must be required"})
         }
-        const imageupload = await cloudinary.uploader.upload(image.path, {
+        const imageupload = await cloudinary.uploader.upload(profilepicurl.path, {
             resource_type: 'image',
         });
         const imageUrl = imageupload.secure_url;
@@ -50,8 +53,8 @@ const addstudent=async (req,res)=>{
 const addbook=async (req,res)=>{
     try{
         const {title,author,genre,summary,totalcopies,keywords,rating,reviewcount}=req.body;
-        const coverImage=req.file;
-        const imageupload = await cloudinary.uploader.upload(coverImage.path, {
+        const coverImageUrl=req.file;
+        const imageupload = await cloudinary.uploader.upload(coverImageUrl.path, {
             resource_type: 'image',
         });
         const imageUrl = imageupload.secure_url;

@@ -3,7 +3,7 @@ import { StatCard } from '@/components/admin/StatCard';
 import { useAdminData } from '@/contexts/AdminDataContext';
 
 export const AdminDashboard = () => {
-  const { stats, issuedBooks, books } = useAdminData();
+  const { stats, issuedBooks, books,students } = useAdminData();
 
   // Get recent activity
   const recentActivity = issuedBooks
@@ -56,9 +56,12 @@ export const AdminDashboard = () => {
         <div className="admin-card p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
           <div className="space-y-4">
-            {recentActivity.map((activity) => (
+            {recentActivity.map((activity) =>{
+              const book = books.find((b) => b._id === activity.bookId);
+              const student= students.find((s) => s._id === activity.userId);
+              return (
               <div
-                key={activity.id}
+                key={activity._id}
                 className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
               >
                 <div
@@ -68,10 +71,10 @@ export const AdminDashboard = () => {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {activity.bookTitle}
+                    {book.title}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {activity.studentName} • {activity.isreturned ? 'Returned' : 'Issued'} on{' '}
+                    {student.name} • {activity.isreturned ? 'Returned' : 'Issued'} on{' '}
                     {new Date(activity.issueDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -83,7 +86,7 @@ export const AdminDashboard = () => {
                   {activity.isreturned ? 'Returned' : 'Active'}
                 </span>
               </div>
-            ))}
+            )})}
           </div>
         </div>
 

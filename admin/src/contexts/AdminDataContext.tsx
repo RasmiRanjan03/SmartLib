@@ -11,10 +11,10 @@ interface AdminDataContextType {
   books: Book[];
   issuedBooks: IssuedBook[];
   stats: DashboardStats;
-  addStudent: (student: Omit<Student, '_id'>) => void;
+  addStudent: (student: FormData) => void;
   updateStudent: (id: string, student: Partial<Student>) => void;
   deleteStudent: (id: string) => void;
-  addBook: (book: Omit<Book, '_id' | 'addedDate' | 'rating' | 'reviewCount'>) => void;
+  addBook: (book: FormData) => void;
   updateBook: (id: string, book: Partial<Book>) => void;
   deleteBook: (id: string) => void;
   issueBook: (studentId: string, bookId: string) => void;
@@ -24,6 +24,7 @@ interface AdminDataContextType {
   getstudents:()=>void;
   getissuedbooks:()=>void;
 }
+
 interface responce{
   success: boolean;
   token?: string;
@@ -43,6 +44,14 @@ interface booksresponce{
 interface issuedbooksresponce{
   success: boolean;
   issuedBooks?: IssuedBook[];
+  message?: string;
+}
+interface studentresponce{
+  success: boolean;
+  message?: string;
+}
+interface bookresponce{
+  success: boolean;
   message?: string;
 }
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
@@ -156,12 +165,15 @@ const logoutadmin=async()=>{
     };
   };
 
-  const addStudent = (student: Omit<Student, '_id'>) => {
-    const newStudent: Student = {
-      ...student,
-      _id: `${Date.now()}`,
-    };
-    setStudents((prev) => [...prev, newStudent]);
+  const addStudent = async(student: FormData) => {
+    console.log(student);
+    const {data}=await axios.post<studentresponce>(backendUrl+"admin/addstudent",student,{withCredentials:true});
+    if(data.success){
+      getstudents();
+      toast.success("Student added successfully!");
+    }else{
+      toast.error(data.message || "Failed to add student.");
+    }
   };
 
   const updateStudent = (_id: string, studentData: Partial<Student>) => {
@@ -174,15 +186,14 @@ const logoutadmin=async()=>{
     setStudents((prev) => prev.filter((student) => student._id !== _id));
   };
 
-  const addBook = (book: Omit<Book, '_id' | 'addedDate' | 'rating' | 'reviewCount'>) => {
-    const newBook: Book = {
-      ...book,
-      _id: `${Date.now()}`,
-      addedDate: new Date().toISOString().split('T')[0],
-      rating: 0,
-      reviewCount: 0,
-    };
-    setBooks((prev) => [...prev, newBook]);
+  const addBook = async(book: FormData) => {
+    const {data}=await axios.post<bookresponce>(backendUrl+"admin/addbook",book,{withCredentials:true});
+    if(data.success){
+      getbooks();
+      toast.success("Book added successfully!");
+    }else{
+      toast.error(data.message || "Failed to add book.");
+    }
   };
 
   const updateBook = (_id: string, bookData: Partial<Book>) => {
@@ -190,6 +201,7 @@ const logoutadmin=async()=>{
       prev.map((book) => (book._id === _id ? { ...book, ...bookData } : book))
     );
   };
+
 
   const deleteBook = (_id: string) => {
     setBooks((prev) => prev.filter((book) => book._id !== _id));

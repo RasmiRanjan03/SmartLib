@@ -28,7 +28,7 @@ const initialFormData = {
   author: '',
   genre: '',
   summary: '',
-  coverImageUrl: '',
+  coverImageUrl: null,
   totalcopies: 1,
   availablecopies: 1,
   keywords: '',
@@ -42,7 +42,7 @@ export const BookManagement = () => {
   const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
   const [formData, setFormData] = useState(initialFormData);
   const [searchTerm, setSearchTerm] = useState('');
-
+  const formdata = new FormData();
   const filteredBooks = books.filter(
     (book) =>
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,7 +92,17 @@ export const BookManagement = () => {
     if (editingBook) {
       updateBook(editingBook._id, bookData);
     } else {
-      addBook(bookData);
+      formdata.append('title',formData.title);
+      formdata.append('author',formData.author);
+      formdata.append('genre',formData.genre);
+      formdata.append('summary',formData.summary);
+      formdata.append('totalcopies',formData.totalcopies.toString());
+      formdata.append('availablecopies',formData.availablecopies.toString());
+      formdata.append('keywords',formData.keywords);
+      if(formData.coverImageUrl){
+        formdata.append('coverImageUrl', formData.coverImageUrl);
+      }
+       addBook(formdata);
     }
     handleCloseDialog();
   };
@@ -263,15 +273,15 @@ export const BookManagement = () => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="coverImageUrl">Cover Image URL</Label>
+                <Label htmlFor="coverImageUrl">Cover Image </Label>
                 <Input
                   id="coverImageUrl"
-                  type="url"
-                  value={formData.coverImageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coverImageUrl: e.target.value })
-                  }
-                  placeholder="https://example.com/cover.jpg"
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFormData({ ...formData, coverImageUrl: e.target.files[0] });
+                    }
+                  }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
