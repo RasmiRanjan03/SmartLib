@@ -1,6 +1,7 @@
 import { LayoutDashboard, Users, BookOpen, ArrowLeftRight, LogOut, Menu, X } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -16,7 +17,10 @@ const menuItems = [
 
 export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const location = useLocation();
-
+  const {logoutadmin}=useAdminData();
+   const logout=()=>{
+    logoutadmin();
+   }
   return (
     <>
       {/* Mobile overlay */}
@@ -81,8 +85,8 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
 
           {/* Logout */}
           <div className="px-4 py-4 border-t border-sidebar-border">
-            <button className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200">
-              <LogOut className="w-5 h-5" />
+            <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200">
+              <div className="w-5 h-5" />
               <span className="font-medium">Logout</span>
             </button>
           </div>

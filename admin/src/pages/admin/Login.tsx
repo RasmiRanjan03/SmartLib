@@ -6,23 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { useApp } from "../context/appContext";
+import { useAdminData } from "@/contexts/AdminDataContext";
 const Login = () => {
   
-  const [registrationNumber, setRegistrationNumber] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {login}=useApp();
+  const {adminlogin}=useAdminData();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!registrationNumber.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
-    login(registrationNumber,password);
+    adminlogin(email,password);
 
     setIsLoading(true);
     
@@ -54,13 +54,13 @@ const Login = () => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="registrationNumber">Registration Number</Label>
+                <Label htmlFor="email">Gmail Id</Label>
                 <Input
-                  id="registrationNumber"
+                  id="email"
                   type="text"
-                  placeholder="Enter your registration number"
-                  value={registrationNumber}
-                  onChange={(e) => setRegistrationNumber(e.target.value)}
+                  placeholder="Enter your gmail id"
+                  value={email}
+                  onChange={(e) => setemail(e.target.value)}
                   className="h-11"
                 />
               </div>
@@ -105,10 +105,7 @@ const Login = () => {
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              <p>Don't have an account?</p>
-              <p className="mt-1">Contact your library administrator</p>
-            </div>
+            
           </CardContent>
         </Card>
 

@@ -17,7 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedcors=[
     'http://localhost:8080',
+    
     'http://localhost:4000',
+    'http://localhost:8081',
 ]
 app.use(cors({
   origin: function (origin, callback) {

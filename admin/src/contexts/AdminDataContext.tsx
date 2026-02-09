@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode,useEffect } from 'react';
 import { Student, Book, IssuedBook, DashboardStats } from '@/types/admin';
 import { mockStudents, mockBooks, mockIssuedBooks } from '@/data/mockData';
+import { toast } from 'sonner';
+import axios from 'axios';
 
 interface AdminDataContextType {
+  atoken: boolean ;
   students: Student[];
   books: Book[];
   issuedBooks: IssuedBook[];
@@ -15,8 +18,15 @@ interface AdminDataContextType {
   deleteBook: (id: string) => void;
   issueBook: (studentId: string, bookId: string) => void;
   returnBook: (issueId: string) => void;
+  adminlogin: (email: string, password: string) => void;
+  logoutadmin:()=>void;
 }
-
+interface responce{
+  success: boolean;
+  token?: string;
+  message?: string;
+  data:string[];
+}
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
 export const useAdminData = () => {
@@ -28,10 +38,51 @@ export const useAdminData = () => {
 };
 
 export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
+  const backendUrl = "http://localhost:4000/api/";
+  const [atoken, setAtoken] = useState(false);
   const [students, setStudents] = useState<Student[]>(mockStudents);
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>(mockIssuedBooks);
 
+  const adminlogin = async (email: string, password: string) => {
+    
+    try{
+      const {data}=await axios.post(backendUrl+"admin/adminlogin",{email,password},{withCredentials:true});
+      if(data.success){
+        setAtoken(true);
+        toast.success("Login successful!");
+      }else{
+        toast.error(data.message || "Login failed.");
+      }
+    }catch(err){
+      console.error("Login failed:", err);
+      toast.error("Login failed. Please check your credentials and try again.");
+    }
+  };
+const logoutadmin=async()=>{ 
+  try{
+    await axios.get(backendUrl+"admin/logoutadmin",{withCredentials:true});
+    setAtoken(false);
+    toast.success("Logged out successfully!");
+  }catch(err){
+    console.error("Logout failed:", err);
+    toast.error("Logout failed. Please try again.");
+  }
+}
+  const checkadmin = async () => {
+    try{
+      const {data}=await axios.get(backendUrl+"admin/checkadmin",{withCredentials:true});
+      if(data.success){
+        setAtoken(true);
+      }else{
+        setAtoken(false);
+      }
+    }catch(err){
+      console.error("Admin check failed:", err);
+      setAtoken(false);
+    }
+  };
+  
   const calculateStats = (): DashboardStats => {
     const today = new Date();
     const overdueBooks = issuedBooks.filter(
@@ -145,10 +196,14 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
       )
     );
   };
+useEffect(() => {
+  checkadmin();
+}, [atoken])
 
   return (
     <AdminDataContext.Provider
       value={{
+        atoken,
         students,
         books,
         issuedBooks,
@@ -161,6 +216,8 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         deleteBook,
         issueBook,
         returnBook,
+        adminlogin,
+        logoutadmin
       }}
     >
       {children}

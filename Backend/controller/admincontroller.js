@@ -99,6 +99,30 @@ const loginadmin=(req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
+const checkadmin=(req,res)=>{
+    try{
+        const atoken=req.cookies?.atoken;
+        if(!atoken){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        const decode=jwt.verify(atoken,process.env.JWT_SECRET);
+        if(decode.email!==process.env.admin_email){
+            return res.json({success:false,message:"Not Authenticated"})
+        }
+        res.json({success:true,message:"Admin Authenticated"})
+    }catch(error){
+        console.error("Error checking admin:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }
+}
+const logoutadmin=(req,res)=>{
+    try{
+        res.clearCookie('atoken', { path: '/', secure: true, sameSite: 'none' });
+        res.json({success:true,message:"Admin Logged Out Successfully"})
+    }catch(error){
+        console.error("Error logging out admin:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const getallstudents=async (req,res)=>{
     try{
         const students=await Student.find();
@@ -107,4 +131,4 @@ const getallstudents=async (req,res)=>{
         console.error("Error fetching students:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin};
