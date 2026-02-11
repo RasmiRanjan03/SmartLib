@@ -89,7 +89,7 @@ const issuebook=async (req,res)=>{
             return res.json({success:false,message:"Book Not Found"})
         }
         if(book.availablecopies<=0){
-            return res.json({success:false,message:"No Available Copies"})
+            return res.json({success:false,message:"No Available"})
         }
         const newissue=new IssuedBook({
                     userId:studentId,
