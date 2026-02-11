@@ -77,6 +77,33 @@ const addbook=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
+const issuebook=async (req,res)=>{
+    try{
+        const {studentId,bookId}=req.body;
+        const student=await Student.findById(studentId);
+        const book=await Book.findById(bookId);
+        if(!student){
+            return res.json({success:false,message:"Student Not Found"})
+        }
+        if(!book){
+            return res.json({success:false,message:"Book Not Found"})
+        }
+        if(book.availablecopies<=0){
+            return res.json({success:false,message:"No Available Copies"})
+        }
+        const newissue=new IssuedBook({
+                    userId:studentId,
+                    bookId,
+                })
+                await newissue.save();
+                book.availablecopies-=1;
+                await book.save();
+                return res.json({success:true,message:"Book Issued Successfully"})
+            }
+        catch(error){
+        console.error("Error issuing book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const loginadmin=(req,res)=>{
     try{
 
@@ -151,4 +178,4 @@ const getissuedbooks=async (req,res)=>{
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook};

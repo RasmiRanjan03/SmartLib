@@ -4,6 +4,11 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 
 export const AdminDashboard = () => {
   const { stats, issuedBooks, books,students } = useAdminData();
+  if(!stats || !issuedBooks || !books || !students){
+    return (<div className="flex justify-center items-center min-h-screen">
+          <span className="text-lg text-muted-foreground">Loading ...</span>
+        </div>);
+  }
 
   // Get recent activity
   const recentActivity = issuedBooks
@@ -56,37 +61,38 @@ export const AdminDashboard = () => {
         <div className="admin-card p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
           <div className="space-y-4">
-            {recentActivity.map((activity) =>{
+            {recentActivity.map((activity) => {
               const book = books.find((b) => b._id === activity.bookId);
-              const student= students.find((s) => s._id === activity.userId);
+              const student = students.find((s) => s._id === activity.userId);
               return (
-              <div
-                key={activity._id}
-                className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
-              >
                 <div
-                  className={`w-2 h-2 rounded-full ${
-                    activity.isreturned ? 'bg-success' : 'bg-warning'
-                  }`}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {book.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {student.name} • {activity.isreturned ? 'Returned' : 'Issued'} on{' '}
-                    {new Date(activity.issueDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <span
-                  className={
-                    activity.isreturned ? 'status-badge-success' : 'status-badge-warning'
-                  }
+                  key={activity._id}
+                  className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
                 >
-                  {activity.isreturned ? 'Returned' : 'Active'}
-                </span>
-              </div>
-            )})}
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      activity.isreturned ? 'bg-success' : 'bg-warning'
+                    }`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {book ? book.title : 'Unknown Book'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {student ? student.name : 'Unknown Student'} • {activity.isreturned ? 'Returned' : 'Issued'} on{' '}
+                      {new Date(activity.issueDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span
+                    className={
+                      activity.isreturned ? 'status-badge-success' : 'status-badge-warning'
+                    }
+                  >
+                    {activity.isreturned ? 'Returned' : 'Active'}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

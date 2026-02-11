@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode,useEffect } from 'react';
 import { Student, Book, IssuedBook, DashboardStats } from '@/types/admin';
-import { mockBooks, mockIssuedBooks } from '@/data/mockData';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { get } from 'http';
@@ -69,7 +68,7 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const [atoken, setAtoken] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
-  const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>(mockIssuedBooks);
+  const [issuedBooks, setIssuedBooks] = useState<IssuedBook[]>([]);
 
   const adminlogin = async (email: string, password: string) => {
     
