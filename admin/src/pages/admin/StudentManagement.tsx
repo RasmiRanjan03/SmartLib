@@ -77,7 +77,16 @@ export const StudentManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingStudent) {
-      updateStudent(editingStudent._id, formData);
+      formdata.append('name',formData.name);
+      formdata.append('redg',formData.redg);
+      formdata.append('course',formData.course);
+      formdata.append('branch',formData.branch);
+      formdata.append('email',formData.email);
+      formdata.append('password',formData.password);
+      if(formData.profilepicurl){
+        formdata.append('profilepicurl',formData.profilepicurl);
+      }
+      updateStudent(editingStudent._id, formdata);
     } else {
       formdata.append('name',formData.name);
       formdata.append('redg',formData.redg);

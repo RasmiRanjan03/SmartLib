@@ -11,7 +11,7 @@ interface AdminDataContextType {
   issuedBooks: IssuedBook[];
   stats: DashboardStats;
   addStudent: (student: FormData) => void;
-  updateStudent: (id: string, student: Partial<Student>) => void;
+  updateStudent: (id: string, student: FormData) => void;
   deleteStudent: (id: string) => void;
   addBook: (book: FormData) => void;
   updateBook: (id: string, book: Partial<Book>) => void;
@@ -175,7 +175,7 @@ const logoutadmin=async()=>{
     }
   };
 
-  const updateStudent = (_id: string, studentData: Partial<Student>) => {
+  const updateStudent = (_id: string, studentData: FormData) => {
     setStudents((prev) =>
       prev.map((student) => (student._id === _id ? { ...student, ...studentData } : student))
     );
