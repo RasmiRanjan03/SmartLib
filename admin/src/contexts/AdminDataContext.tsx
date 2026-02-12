@@ -235,8 +235,19 @@ const updateStudent = async (id: string, formData: FormData) => {
   };
 
 
-  const deleteBook = (_id: string) => {
-    setBooks((prev) => prev.filter((book) => book._id !== _id));
+  const deleteBook = async(_id: string) => {
+    try {
+      const {data} = await axios.post(backendUrl+"admin/deletebook", {_id}, {withCredentials:true});
+      if(data.success){
+        getbooks();
+        toast.success("Book deleted successfully!");
+      }else{
+        toast.error(data.message || "Failed to delete book.");
+      }
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      toast.error("Failed to delete book.");
+    }
   };
 
   const issueBook = async(studentId: string, bookId: string) => {

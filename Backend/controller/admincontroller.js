@@ -160,6 +160,21 @@ const updatebook=async (req,res)=>{
         console.error("Error updating book:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
+const deletebook=async (req,res)=>{
+    try{
+        const {_id}=req.body;
+        if(!_id){
+            return res.json({success:false,message:"Book ID is required"})
+        }
+        const deletedBook=await Book.findByIdAndDelete(_id);
+        if(!deletedBook){
+            return res.json({success:false,message:"Book Not Found"})
+        }
+        res.json({success:true,message:"Book Deleted Successfully"})
+    }catch(error){
+        console.error("Error deleting book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const issuebook=async (req,res)=>{
     try{
         const {studentId,bookId}=req.body;
@@ -261,4 +276,4 @@ const getissuedbooks=async (req,res)=>{
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook,deletebook};
