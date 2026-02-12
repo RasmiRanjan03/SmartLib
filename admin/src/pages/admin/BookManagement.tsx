@@ -42,14 +42,13 @@ export const BookManagement = () => {
   const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
   const [formData, setFormData] = useState(initialFormData);
   const [searchTerm, setSearchTerm] = useState('');
-  const formdata = new FormData();
   const filteredBooks = books.filter(
     (book) =>
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.genre.toLowerCase().includes(searchTerm.toLowerCase())
+    book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.genre.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  
   const handleOpenDialog = (book?: Book) => {
     if (book) {
       setEditingBook(book);
@@ -69,15 +68,17 @@ export const BookManagement = () => {
     }
     setIsDialogOpen(true);
   };
-
+  
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingBook(null);
     setFormData(initialFormData);
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    
+    const formdata = new FormData();
     const bookData = {
       title: formData.title,
       author: formData.author,
@@ -88,11 +89,7 @@ export const BookManagement = () => {
       availablecopies: formData.availablecopies,
       keywords: formData.keywords.split(',').map((k) => k.trim()).filter(Boolean),
     };
-
-    if (editingBook) {
-      updateBook(editingBook._id, bookData);
-    } else {
-      formdata.append('title',formData.title);
+    formdata.append('title',formData.title);
       formdata.append('author',formData.author);
       formdata.append('genre',formData.genre);
       formdata.append('summary',formData.summary);
@@ -102,6 +99,11 @@ export const BookManagement = () => {
       if(formData.coverImageUrl){
         formdata.append('coverImageUrl', formData.coverImageUrl);
       }
+
+    if (editingBook) {
+      formdata.append('_id', editingBook._id);
+      await updateBook(editingBook._id, formdata);
+    } else {
        addBook(formdata);
     }
     handleCloseDialog();

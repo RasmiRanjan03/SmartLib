@@ -14,7 +14,7 @@ interface AdminDataContextType {
   updateStudent: (id: string, student: FormData) => void;
   deleteStudent: (id: string) => void;
   addBook: (book: FormData) => void;
-  updateBook: (id: string, book: Partial<Book>) => void;
+  updateBook: (id: string, book: FormData) => void;
   deleteBook: (id: string) => void;
   issueBook: (studentId: string, bookId: string) => void;
   returnBook: (issueId: string) => void;
@@ -176,17 +176,12 @@ const logoutadmin=async()=>{
 
 const updateStudent = async (id: string, formData: FormData) => {
     try {
-      // Ensure _id is in the FormData
       if (!formData.has('_id')) {
         formData.append('_id', id);
       }
-
       const response = await axios.post(`${backendUrl}admin/updatestudent`, formData, {
         withCredentials: true
       });
-
-     
-
       if (response.data.success) {
         getstudents(); // Refresh the list
       } else {
@@ -223,10 +218,20 @@ const updateStudent = async (id: string, formData: FormData) => {
     }
   };
 
-  const updateBook = (_id: string, bookData: Partial<Book>) => {
-    setBooks((prev) =>
-      prev.map((book) => (book._id === _id ? { ...book, ...bookData } : book))
-    );
+  const updateBook = async (_id: string, bookData: FormData) => {
+    try {
+      const response = await axios.post(`${backendUrl}admin/updatebook`, bookData, {
+        withCredentials: true
+      });
+      if (response.data.success) {
+        getbooks(); // Refresh the list
+      } else {
+        throw new Error(response.data.message || 'Failed to update book');
+      }
+    } catch (error) {
+      console.error('Error updating book:', error);
+      throw error;
+    }
   };
 
 

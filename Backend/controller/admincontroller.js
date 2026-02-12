@@ -129,6 +129,37 @@ const addbook=async (req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
+const updatebook=async (req,res)=>{
+    try{
+        const {_id,title,author,genre,summary,totalcopies,keywords,rating,reviewcount}=req.body;
+        let updateData={
+            title,
+            author,
+            totalcopies,
+            keywords:keywords ? keywords.split(',').map(kw => kw.trim()) : [],
+            genre,
+            summary,
+            rating,
+            reviewcount,
+        }
+        if(req.file){
+            const coverImageUrl=req.file;
+            const imageupload = await cloudinary.uploader.upload(coverImageUrl.path, {
+                resource_type: 'image',
+            });
+            const imageUrl = imageupload.secure_url;
+            updateData.coverImageUrl=imageUrl;
+        }
+        const updatedBook = await Book.findByIdAndUpdate(_id, updateData, { new: true });
+        if(!updatedBook) {
+            return res.json({ success: false, message: "Book not found" });
+        }
+        res.json({ success: true, message: "Book Updated Successfully", data: updatedBook });
+    }
+    catch(error){
+        console.error("Error updating book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const issuebook=async (req,res)=>{
     try{
         const {studentId,bookId}=req.body;
@@ -230,4 +261,4 @@ const getissuedbooks=async (req,res)=>{
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook};
