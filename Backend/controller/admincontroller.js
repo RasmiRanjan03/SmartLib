@@ -87,6 +87,21 @@ const updatestudent = async (req, res) => {
         res.json({ success: false, message: "Internal Server Error" });
     }
 }
+const deletestudent=async (req,res)=>{ 
+    try{
+        const {_id}=req.body;
+        if(!_id){
+            return res.json({success:false,message:"Student ID is required"})
+        }
+        const deletedStudent=await Student.findByIdAndDelete(_id);
+        if(!deletedStudent){
+            return res.json({success:false,message:"Student Not Found"})
+        }
+        res.json({success:true,message:"Student Deleted Successfully"})
+    }catch(error){
+        console.error("Error deleting student:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const addbook=async (req,res)=>{
     try{
         const {title,author,genre,summary,totalcopies,keywords,rating,reviewcount}=req.body;
@@ -215,4 +230,4 @@ const getissuedbooks=async (req,res)=>{
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent};

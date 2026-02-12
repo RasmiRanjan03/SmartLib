@@ -144,10 +144,6 @@ export const StudentManagement = () => {
     setIsDeleting(true);
     try {
       await deleteStudent(studentToDelete._id);
-      toast({
-        title: 'Success',
-        description: 'Student deleted successfully',
-      });
       setIsDeleteDialogOpen(false);
       setStudentToDelete(null);
     } catch (error) {
