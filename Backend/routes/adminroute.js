@@ -1,4 +1,5 @@
-import {addstudent,addbook,loginadmin,checkadmin,logoutadmin,getallstudents,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook,deletebook} from "../controller/admincontroller.js";
+import {addstudent,addbook,loginadmin,checkadmin,logoutadmin,getallstudents,getallbooks,getissuedbooks,issuebook,
+    updatestudent,deletestudent,updatebook,deletebook,returnbook} from "../controller/admincontroller.js";
 import adminAuth from "../middleware/adminauth.js";
 import express from 'express';
 import upload from '../middleware/multer.js';
@@ -17,4 +18,5 @@ router.post('/updatestudent',upload.single("profilepicurl"),adminAuth,updatestud
 router.post('/deletestudent',adminAuth,deletestudent)
 router.post('/updatebook',upload.single("coverImageUrl"),adminAuth,updatebook)
 router.post('/deletebook',adminAuth,deletebook)
+router.post('/returnbook',adminAuth,returnbook)
 export default router;

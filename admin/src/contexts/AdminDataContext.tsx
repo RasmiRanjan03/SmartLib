@@ -270,32 +270,22 @@ const updateStudent = async (id: string, formData: FormData) => {
    
   };
 
-  const returnBook = (issueId: string) => {
-    const issue = issuedBooks.find((i) => i._id === issueId);
+  const returnBook = async (issueId: string) => {
+    try{
+const issue = issuedBooks.find((i) => i._id === issueId);
     if (!issue) return;
+    const { data } = await axios.post(`${backendUrl}admin/returnbook`, { issueId }, { withCredentials: true });
+    if (data.success) {
+      toast.success("Book returned successfully!");
+      getissuedbooks(); // Refresh issued books list
+      getbooks(); // Refresh books list to update availability
+    } else {
+      toast.error(data.message || "Failed to return the book.");
 
-    const today = new Date();
-    const dueDate = new Date(issue.dueDate);
-    let fine = 0;
-
-    if (today > dueDate) {
-      const daysOverdue = Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-      fine = daysOverdue * 10; // $10 per day
+    }}catch(err){
+      console.log(err)
+      toast.error("Failed to return the book")
     }
-
-    setIssuedBooks((prev) =>
-      prev.map((i) =>
-        i._id === issueId
-          ? { ...i, isreturned: true, returnDate: today.toISOString().split('T')[0], fine }
-          : i
-      )
-    );
-
-    setBooks((prev) =>
-      prev.map((b) =>
-        b._id === issue.bookId ? { ...b, availablecopies: b.availablecopies + 1 } : b
-      )
-    );
   };
 useEffect(() => {
   checkadmin();

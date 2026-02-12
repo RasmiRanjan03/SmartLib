@@ -202,6 +202,24 @@ const issuebook=async (req,res)=>{
         console.error("Error issuing book:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
+const returnbook=async (req,res)=>{
+    try{
+        const {issueId}=req.body;
+        const issueRecord=await IssuedBook.findById(issueId);
+        if(!issueRecord){
+            return res.json({success:false,message:"Issue Record Not Found"})
+        }
+        const book=await Book.findById(issueRecord.bookId);
+        if(book){
+            book.availablecopies+=1;
+            await book.save();
+        }
+        await IssuedBook.findByIdAndUpdate(issueId, { isreturned: true,returnDate: Date.now() });
+        res.json({success:true,message:"Book Returned Successfully"})
+    }catch(error){
+        console.error("Error returning book:", error);
+        res.json({success:false,message:"Internal Server Error"})
+    }}
 const loginadmin=(req,res)=>{
     try{
 
@@ -276,4 +294,4 @@ const getissuedbooks=async (req,res)=>{
         console.error("Error fetching issued books:", error);
         res.json({success:false,message:"Internal Server Error"})
     }}
-export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook,deletebook};
+export {addstudent,addbook,getallstudents,loginadmin,checkadmin,logoutadmin,getallbooks,getissuedbooks,issuebook,updatestudent,deletestudent,updatebook,deletebook,returnbook};
