@@ -206,34 +206,24 @@ const logoutadmin=async()=>{
     setBooks((prev) => prev.filter((book) => book._id !== _id));
   };
 
-  const issueBook = (studentId: string, bookId: string) => {
-    const student = students.find((s) => s._id === studentId);
-    const book = books.find((b) => b._id === bookId);
+  const issueBook = async(studentId: string, bookId: string) => {
+    try{
+      const {data}= await axios.post(backendUrl+'admin/issuebook',{studentId,bookId},{withCredentials:true})
+      if(data.success){
+        toast.message("Book issued Successfully")
+        getissuedbooks()
 
-    if (!student || !book || book.availablecopies <= 0) return;
-
-    const issueDate = new Date();
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 14); // 14 days lending period
-
-    const newIssue: IssuedBook = {
-      _id: `${Date.now()}`,
-      userId: studentId,
-      bookId,
-      bookTitle: book.title,
-      studentName: student.name,
-      issueDate: issueDate.toISOString().split('T')[0],
-      dueDate: dueDate.toISOString().split('T')[0],
-      isreturned: false,
-      fine: 0,
-    };
-
-    setIssuedBooks((prev) => [...prev, newIssue]);
-    setBooks((prev) =>
-      prev.map((b) =>
-        b._id === bookId ? { ...b, availablecopies: b.availablecopies - 1 } : b
-      )
-    );
+      }
+      else{
+        console.log(data.message)
+        toast.message(data.message)
+      }
+      
+    }catch(err){
+      console.log(err)
+      toast.error("Failed to issued a book")
+    }
+   
   };
 
   const returnBook = (issueId: string) => {
