@@ -22,8 +22,19 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/components/ui/use-toast';
 
-const initialFormData = {
+interface StudentFormData {
+  name: string;
+  redg: string;
+  course: string;
+  branch: string;
+  email: string;
+  profilepicurl: File | null;
+  password: string;
+}
+
+const initialFormData: StudentFormData = {
   name: '',
   redg: '',
   course: '',
@@ -35,13 +46,17 @@ const initialFormData = {
 
 export const StudentManagement = () => {
   const { students, addStudent, updateStudent, deleteStudent } = useAdminData();
+  const { toast } = useToast();
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState<StudentFormData>(initialFormData);
   const [searchTerm, setSearchTerm] = useState('');
-  const formdata=new FormData();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const filteredStudents = students.filter(
     (student) =>
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,8 +73,8 @@ export const StudentManagement = () => {
         course: student.course,
         branch: student.branch,
         email: student.email,
-        profilepicurl: student.profilepicurl,
-        password: student.password,
+        profilepicurl: null,
+        password: '',
       });
     } else {
       setEditingStudent(null);
@@ -76,30 +91,46 @@ export const StudentManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingStudent) {
-      formdata.append('name',formData.name);
-      formdata.append('redg',formData.redg);
-      formdata.append('course',formData.course);
-      formdata.append('branch',formData.branch);
-      formdata.append('email',formData.email);
-      formdata.append('password',formData.password);
-      if(formData.profilepicurl){
-        formdata.append('profilepicurl',formData.profilepicurl);
+    setIsSubmitting(true);
+
+    try {
+      const formdata = new FormData();
+      formdata.append('name', formData.name);
+      formdata.append('redg', formData.redg);
+      formdata.append('course', formData.course);
+      formdata.append('branch', formData.branch);
+      formdata.append('email', formData.email);
+
+      if (formData.password) {
+        formdata.append('password', formData.password);
       }
-      updateStudent(editingStudent._id, formdata);
-    } else {
-      formdata.append('name',formData.name);
-      formdata.append('redg',formData.redg);
-      formdata.append('course',formData.course);
-      formdata.append('branch',formData.branch);
-      formdata.append('email',formData.email);
-      formdata.append('password',formData.password);
-      if(formData.profilepicurl){
-        formdata.append('profilepicurl',formData.profilepicurl);
+
+      if (formData.profilepicurl) {
+        formdata.append('profilepicurl', formData.profilepicurl);
       }
-       addStudent(formdata);
+
+      if (editingStudent) {
+        formdata.append('_id', editingStudent._id);
+        await updateStudent(editingStudent._id, formdata);
+        toast({
+          title: 'Success',
+          description: 'Student updated successfully',
+        });
+      } else {
+        await addStudent(formdata);
+      }
+
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Failed to save student:', error);
+      toast({
+        title: 'Error',
+        description: `Failed to ${editingStudent ? 'update' : 'add'} student. Please try again.`,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    handleCloseDialog();
   };
 
   const handleDeleteClick = (student: Student) => {
@@ -107,32 +138,56 @@ export const StudentManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (studentToDelete) {
-      deleteStudent(studentToDelete._id);
+  const handleConfirmDelete = async () => {
+    if (!studentToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteStudent(studentToDelete._id);
+      toast({
+        title: 'Success',
+        description: 'Student deleted successfully',
+      });
+      setIsDeleteDialogOpen(false);
+      setStudentToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete student:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete student. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
     }
-    setIsDeleteDialogOpen(false);
-    setStudentToDelete(null);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Students</h2>
-          <p className="text-sm text-muted-foreground">Manage student records</p>
+          <h2 className="text-3xl font-bold tracking-tight">Students</h2>
+          <p className="text-muted-foreground">Manage student records</p>
         </div>
         <Button onClick={() => handleOpenDialog()} className="gap-2">
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           Add Student
         </Button>
       </div>
 
       {/* Search */}
-      <div className="admin-card p-4">
+      <div>
         <Input
-          type="text"
           placeholder="Search by name, registration number, or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -141,163 +196,211 @@ export const StudentManagement = () => {
       </div>
 
       {/* Table */}
-      <div className="admin-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Profile</th>
-                <th>Name</th>
-                <th>Reg. Number</th>
-                <th>Course</th>
-                <th>Branch</th>
-                <th>Email</th>
-                <th className="text-right">Actions</th>
+      <div className="rounded-md border">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="p-4 text-left font-medium">Profile</th>
+              <th className="p-4 text-left font-medium">Name</th>
+              <th className="p-4 text-left font-medium">Reg. Number</th>
+              <th className="p-4 text-left font-medium">Course</th>
+              <th className="p-4 text-left font-medium">Branch</th>
+              <th className="p-4 text-left font-medium">Email</th>
+              <th className="p-4 text-left font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredStudents.map((student) => (
+              <tr key={student._id} className="border-b">
+                <td className="p-4">
+                  <Avatar>
+                    <AvatarImage src={student.profilepicurl} alt={student.name} />
+                    <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
+                  </Avatar>
+                </td>
+                <td className="p-4">{student.name}</td>
+                <td className="p-4">{student.redg}</td>
+                <td className="p-4">{student.course}</td>
+                <td className="p-4">{student.branch}</td>
+                <td className="p-4">{student.email}</td>
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenDialog(student)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteClick(student)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map((student) => (
-                <tr key={student._id}>
-                  <td>
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={student.profilepicurl} alt={student.name} />
-                      <AvatarFallback>
-                        {student.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </td>
-                  <td className="font-medium">{student.name}</td>
-                  <td>
-                    <span className="status-badge-info">{student.redg}</span>
-                  </td>
-                  <td>{student.course}</td>
-                  <td>{student.branch}</td>
-                  <td className="text-muted-foreground">{student.email}</td>
-                  <td>
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpenDialog(student)}
-                        className="h-8 w-8"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClick(student)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredStudents.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center py-8 text-muted-foreground">
-                    No students found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))}
+            {filteredStudents.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center py-8">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    {searchTerm ? (
+                      <>
+                        <p>No students found matching "{searchTerm}"</p>
+                        <Button variant="link" onClick={() => setSearchTerm('')}>
+                          Clear search
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <p>No students yet</p>
+                        <Button onClick={() => handleOpenDialog()}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add your first student
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingStudent ? 'Edit Student' : 'Add New Student'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="redg">Registration Number</Label>
-                <Input
-                  id="redg"
-                  value={formData.redg}
-                  onChange={(e) =>
-                    setFormData({ ...formData, redg: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="course">Course</Label>
-                  <Input
-                    id="course"
-                    value={formData.course}
-                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="branch">Branch</Label>
-                  <Input
-                    id="branch"
-                    value={formData.branch}
-                    onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="profilepic">Profile Image </Label>
-                <Input
-                  id="profilepic"
-                  type="file"
-                  onChange={(e) => setFormData({ ...formData, profilepicurl: e.target.files[0] })}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required={!editingStudent}
-                  placeholder={editingStudent ? 'Leave blank to keep current' : 'Enter password'}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+                disabled={isSubmitting}
+              />
             </div>
-            <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+
+            <div className="space-y-2">
+              <Label htmlFor="redg">Registration Number</Label>
+              <Input
+                id="redg"
+                value={formData.redg}
+                onChange={(e) =>
+                  setFormData({ ...formData, redg: e.target.value })
+                }
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="course">Course</Label>
+              <Input
+                id="course"
+                value={formData.course}
+                onChange={(e) =>
+                  setFormData({ ...formData, course: e.target.value })
+                }
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="branch">Branch</Label>
+              <Input
+                id="branch"
+                value={formData.branch}
+                onChange={(e) =>
+                  setFormData({ ...formData, branch: e.target.value })
+                }
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="profilepic">Profile Image</Label>
+              <Input
+                id="profilepic"
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    profilepicurl: e.target.files?.[0] || null,
+                  })
+                }
+                disabled={isSubmitting}
+              />
+              {editingStudent && (
+                <p className="text-sm text-muted-foreground">
+                  Leave empty to keep current image
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                required={!editingStudent}
+                placeholder={
+                  editingStudent ? 'Leave blank to keep current' : 'Enter password'
+                }
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCloseDialog}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button type="submit">
-                {editingStudent ? 'Save Changes' : 'Add Student'}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting
+                  ? 'Saving...'
+                  : editingStudent
+                  ? 'Save Changes'
+                  : 'Add Student'}
               </Button>
             </div>
           </form>
@@ -310,17 +413,18 @@ export const StudentManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Student</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {studentToDelete?.name}? This action cannot
-              be undone.
+              Are you sure you want to delete {studentToDelete?.name}? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -64,6 +64,7 @@ const updatestudent = async (req, res) => {
             redg, 
             password 
         };
+        console.log(updateData)
 
 
         if (req.file) {

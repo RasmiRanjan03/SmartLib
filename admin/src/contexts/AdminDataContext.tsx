@@ -165,7 +165,6 @@ const logoutadmin=async()=>{
   };
 
   const addStudent = async(student: FormData) => {
-    console.log(student);
     const {data}=await axios.post<studentresponce>(backendUrl+"admin/addstudent",student,{withCredentials:true});
     if(data.success){
       getstudents();
@@ -175,11 +174,29 @@ const logoutadmin=async()=>{
     }
   };
 
-  const updateStudent = (_id: string, studentData: FormData) => {
-    setStudents((prev) =>
-      prev.map((student) => (student._id === _id ? { ...student, ...studentData } : student))
-    );
-  };
+const updateStudent = async (id: string, formData: FormData) => {
+    try {
+      // Ensure _id is in the FormData
+      if (!formData.has('_id')) {
+        formData.append('_id', id);
+      }
+
+      const response = await axios.post(`${backendUrl}admin/updatestudent`, formData, {
+        withCredentials: true
+      });
+
+     
+
+      if (response.data.success) {
+        getstudents(); // Refresh the list
+      } else {
+        throw new Error(response.data.message || 'Failed to update student');
+      }
+    } catch (error) {
+      console.error('Error updating student:', error);
+      throw error;
+    }
+  }
 
   const deleteStudent = (_id: string) => {
     setStudents((prev) => prev.filter((student) => student._id !== _id));
