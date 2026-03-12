@@ -246,20 +246,26 @@ const loginadmin=(req,res)=>{
         res.json({success:false,message:"Internal Server Error"})
     }
 }
-const checkadmin=(req,res)=>{
-    try{
-        const atoken=req.cookies?.atoken;
-        if(!atoken){
-            return res.json({success:false,message:"Not Authenticated"})
+const checkadmin = (req, res) => {
+    try {
+        const atoken = req.cookies?.atoken;
+        console.log("CheckAdmin Controller - Cookie found:", !!atoken);
+
+        if (!atoken) {
+            return res.json({ success: false, message: "Not Authenticated: No token" });
         }
-        const decode=jwt.verify(atoken,process.env.JWT_SECRET);
-        if(decode.email!==process.env.admin_email){
-            return res.json({success:false,message:"Not Authenticated"})
+
+        const decode = jwt.verify(atoken, process.env.JWT_SECRET);
+        console.log("CheckAdmin - Token decoded email:", decode.email);
+        console.log("CheckAdmin - Expected email (from env):", process.env.admin_email);
+
+        if (decode.email !== process.env.admin_email) {
+            return res.json({ success: false, message: "Not Authenticated: Email mismatch" });
         }
-        res.json({success:true,message:"Admin Authenticated"})
-    }catch(error){
+        res.json({ success: true, message: "Admin Authenticated" });
+    } catch (error) {
         console.error("Error checking admin:", error);
-        res.json({success:false,message:"Internal Server Error"})
+        res.json({ success: false, message: "Internal Server Error: " + error.message });
     }
 }
 const logoutadmin=(req,res)=>{

@@ -1,12 +1,12 @@
-import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+import express from 'express';
 import cors from 'cors';
 import connectCloudinary from './config/cloudinary.js';
 import connectDB from './config/mongodbconnection.js';
 import cookieParser from 'cookie-parser';
 import admin from './routes/adminroute.js';
 import student from './routes/studentroute.js';
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,12 +27,14 @@ const allowedcors=[
 ]
 app.use(cors({
   origin: function (origin, callback) {
+    console.log("Incoming Request Origin:", origin);
     // allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
 
     if (allowedcors.includes(origin)) {
       callback(null, true);
     } else {
+      console.log("Origin not allowed by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
