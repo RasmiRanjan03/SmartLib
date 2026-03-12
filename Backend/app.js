@@ -21,7 +21,8 @@ const allowedcors=[
     'http://localhost:8081',
     'http://localhost:5173',
     'http://localhost:3000',
-    "https://smartlib-1.onrender.com"
+    "https://smartlib-1.onrender.com",
+    "https://smartlibadmin-0miq.onrender.com/"
 ]
 app.use(cors({
   origin: function (origin, callback) {
