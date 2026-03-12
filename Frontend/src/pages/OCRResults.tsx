@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upload, Search, Camera, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import Layout from "@/components/Layout";
 import BookCard from "@/components/BookCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { books } from "@/data/mockData";
+import { useApp } from "../context/appContext"
 
 const OCRResults = () => {
+  const { books, baseUrl } = useApp();
   const navigate = useNavigate();
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Simulated OCR results - in real app, this would come from OCR API
-  const matchedBooks = hasSearched ? books.slice(0, 3) : [];
+  const [matchedBooksReal, setMatchedBooksReal] = useState<any[]>([]);
+
+  // Use the real results from the API
+  const matchedBooks = hasSearched ? matchedBooksReal : [];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,15 +32,63 @@ const OCRResults = () => {
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!uploadedImage) return;
     
     setIsProcessing(true);
-    // Simulate OCR processing
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Convert base64 image to Blob
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      
+      const formData = new FormData();
+      formData.append('image', blob, 'book-cover.jpg');
+
+      const apiResponse = await fetch(`${baseUrl}/api/student/ocr-search`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // Important for cookies/session
+      });
+
+      const result = await apiResponse.json();
+      
+      if (result.success) {
+        // Normalize book properties for frontend compatibility
+        const normalizedResults = result.data.map((book: any) => ({
+          _id: book._id,
+          title: book.title,
+          author: book.author,
+          genre: book.genre,
+          summary: book.summary,
+          coverImageUrl: book.coverImageUrl || book.coverImage,
+          rating: book.rating,
+          reviewCount: book.reviewCount || book.reviewcount || 0,
+          totalcopies: book.totalcopies ?? book.totalCopies ?? 0,
+          availablecopies: book.availablecopies ?? book.availableCopies ?? 0,
+          keywords: book.keywords,
+          addedDate: book.addedDate
+        }));
+        setHasSearched(true);
+        setMatchedBooksReal(normalizedResults);
+        if (normalizedResults.length === 0) {
+          toast.info("OCR processed, but no matching books found.");
+        } else {
+          toast.success(`Found ${normalizedResults.length} matching books!`);
+        }
+      } else {
+        console.error("OCR Search failed:", result.message);
+        toast.error(`OCR Error: ${result.message}`);
+        setMatchedBooksReal([]);
+        setHasSearched(true);
+      }
+    } catch (error: any) {
+      console.error("Error during OCR search:", error);
+      toast.error(`Network or Server Error: ${error.message}`);
+      setMatchedBooksReal([]);
       setHasSearched(true);
-    }, 2000);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const clearImage = () => {

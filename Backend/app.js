@@ -17,9 +17,10 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedcors=[
     'http://localhost:8080',
-    
     'http://localhost:4000',
     'http://localhost:8081',
+    'http://localhost:5173',
+    'http://localhost:3000',
 ]
 app.use(cors({
   origin: function (origin, callback) {
@@ -42,4 +43,10 @@ app.get('/', (req, res) => {
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// Global Error Handler for debugging
+app.use((err, req, res, next) => {
+    console.error("Global Error Handler:", err);
+    res.status(500).json({ success: false, message: err.message || "Internal Server Error" });
 });

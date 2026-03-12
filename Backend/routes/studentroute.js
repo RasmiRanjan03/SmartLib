@@ -1,7 +1,8 @@
 import express from 'express';
 import { studentlogin,checkstudentauth,logout,getstudentdetails,getallbooks,issuebook,getcurrentlyissuedbooks,getborrowinghistory,getallauthors,getallgeners } from '../controller/studentcontoller.js';
+import { ocrSearch } from '../controller/ocrcontroller.js';
 import studentAuth from '../middleware/studentauth.js';
-import multer from 'multer';
+import upload from '../middleware/multer.js';
 
 const router=express.Router();
 router.post('/login',studentlogin)
@@ -14,4 +15,5 @@ router.get('/currentlyissuedbooks',studentAuth,getcurrentlyissuedbooks)
 router.get('/borrowinghistory',studentAuth,getborrowinghistory)
 router.get('/allgeners',getallgeners)
 router.get('/allauthors',getallauthors)
+router.post('/ocr-search', upload.single('image'), ocrSearch)
 export default router;
