@@ -40,7 +40,7 @@ app.use(cookieParser());
 app.use('/api/admin',admin)
 app.use('/api/student',student)
 app.get('/', (req, res) => {
-  res.send('Welcome to SmartLib Backend Rasmi!');
+  res.redirect('https://smartlib-1.onrender.com/login');
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
