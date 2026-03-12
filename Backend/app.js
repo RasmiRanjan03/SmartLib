@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use('/api/admin',admin)
 app.use('/api/student',student)
 app.get('/', (req, res) => {
-  res.redirect('https://smartlib-1.onrender.com/login');
+  res.redirect('https://smartlib-1.onrender.com/');
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
