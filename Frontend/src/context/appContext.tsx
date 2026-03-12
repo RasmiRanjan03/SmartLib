@@ -102,7 +102,10 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
-  const baseUrl = 'https://smartlib-ljxa.onrender.com'; // Change to your backend URL
+  const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const baseUrl = isLocalhost 
+    ? 'http://localhost:4000' 
+    : 'https://smartlib-ljxa.onrender.com';
   const [token, settoken] = useState<Boolean>(false)
   const [student, setstudent] = useState<student >()
   const [books, setbooks] = useState<book[]>([])

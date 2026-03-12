@@ -64,7 +64,10 @@ export const useAdminData = () => {
 };
 
 export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
-  const backendUrl = "https://smartlib-ljxa.onrender.com/api/";
+  const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const backendUrl = isLocalhost 
+    ? "http://localhost:4000/api/" 
+    : "https://smartlib-ljxa.onrender.com/api/";
   const [atoken, setAtoken] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [books, setBooks] = useState<Book[]>([]);

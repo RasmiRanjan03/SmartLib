@@ -6,7 +6,7 @@ const adminAuth = async (req, res, next) => {
             return res.status(401).json({ success: false, message: "Not Authenticated" });
         }
         const decode = jwt.verify(atoken, process.env.JWT_SECRET);
-        if (decode.email !== process.env.ADMIN_EMAIL) {
+        if (decode.email !== process.env.admin_email) {
             return res.status(401).json({ success: false, message: "Not Authenticated" });
         }
         next();
